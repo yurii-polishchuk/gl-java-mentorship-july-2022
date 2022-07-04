@@ -31,8 +31,8 @@ class RootControllerTest {
     @Test
     @DisplayName("""
             GIVEN valid root endpoint
-            "WHEN performing valid GET request
-            "THEN return empty success response
+            WHEN performing valid GET request
+            THEN return empty success response
             """)
     void rootEndpointPositive() throws Exception {
         // GIVEN
