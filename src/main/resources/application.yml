@@ -1,0 +1,35 @@
+# Spring
+spring:
+  application:
+    name: statussvc
+  profiles:
+    active: default
+  main:
+    bannerMode: off
+
+# Embedded Server
+server:
+  port: 8080
+  serverHeader: ${spring.application.name}
+  error:
+    includeStackTrace: never
+    includeException: false
+
+# Spring Boot Actuator
+management:
+  endpoints:
+    web:
+      basePath: /
+      exposure:
+        include: health, info, flyway
+
+# Application
+application:
+  service:
+    version: 1.0.0
+
+# Logging
+logging:
+  file:
+    name: ${spring.application.name}.log
+  config: classpath:log4j2.yml

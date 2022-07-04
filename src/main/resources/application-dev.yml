@@ -1,0 +1,8 @@
+# Spring
+spring:
+  main:
+    bannerMode: console
+
+# Logging
+logging:
+  config: classpath:log4j2-dev.yml

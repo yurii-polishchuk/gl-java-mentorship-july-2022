@@ -1,0 +1,23 @@
+configuration:
+  shutdownHook: disable
+  log4jContextSelector: org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+  status: warn
+  appenders:
+    console:
+      name: console
+      target: SYSTEM_OUT
+      patternLayout:
+        pattern: '%r %p %c %x - %m%n'
+  loggers:
+    asyncRoot:
+      level: info
+      includeLocation: true
+      appenderRef:
+        - ref: console
+    asyncLogger:
+      - name: org.springframework
+        level: info
+      - name: none.org.hibernate.SQL
+        level: info
+      - name: com.example
+        level: info

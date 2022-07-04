@@ -1,0 +1,78 @@
+plugins {
+    id "java"
+    id "idea"
+    id "io.freefair.lombok" version "6.5.0.2"
+    id "org.springframework.boot" version "2.7.1"
+    id "io.spring.dependency-management" version "1.0.12.RELEASE"
+}
+
+repositories {
+    mavenCentral()
+}
+
+group = "com.example"
+version = "1.0.0"
+
+def mapStructVersion = "1.5.2.Final"
+
+configurations {
+    implementation.exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+    implementation.exclude group: "ch.qos.logback", module: "logback-core"
+    implementation.exclude group: "ch.qos.logback", module: "logback-classic"
+    implementation.exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
+}
+
+dependencyManagement {
+    imports {
+        // Testing
+        mavenBom "org.testcontainers:testcontainers-bom:1.17.3"
+    }
+}
+
+dependencies {
+    // Core, Web
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-jetty"
+
+    // Validation
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+
+    // Monitoring
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+
+    // Logging
+    implementation "org.springframework.boot:spring-boot-starter-log4j2"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
+    implementation "com.lmax:disruptor:3.4.4"
+
+    // Commons, Utilities
+    implementation "org.apache.commons:commons-lang3"
+
+    // Testing
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.testcontainers:junit-jupiter"
+
+    // Annotation Processing: MapStruct
+    implementation "org.mapstruct:mapstruct:$mapStructVersion"
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+
+    // Annotation Processing: Development
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
+jar {
+    enabled = false
+}
+
+test {
+    useJUnitPlatform()
+}
+
+springBoot {
+    buildInfo()
+}
