@@ -43,12 +43,18 @@
 
 ## Local Run
 
+* Docker Compose
+
+    * `cd local && docker compose up`
+
 * Unix/Linux:
 
     * `./gradlew bootRun -Dspring.profiles.active=dev`
+
 * macOS:
 
     * `./gradlew bootRun -Dspring.profiles.active=dev`
+
 * Windows
 
     * `gradlew bootRun -Dspring.profiles.active=dev`
