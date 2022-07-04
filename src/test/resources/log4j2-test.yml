@@ -1,4 +1,6 @@
 configuration:
+  shutdownHook: disable
+  log4jContextSelector: org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
   status: warn
   appenders:
     console:
@@ -12,6 +14,6 @@ configuration:
       includeLocation: true
       appenderRef:
         - ref: console
-    asynclogger:
+    asyncLogger:
       - name: com.example
         level: debug

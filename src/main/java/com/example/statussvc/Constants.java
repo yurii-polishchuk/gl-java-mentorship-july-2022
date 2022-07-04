@@ -8,7 +8,7 @@ public class Constants {
 
     // SERVICE
     public static final String SERVICE_PACKAGE = "com.example";
-    public static final String SERVICE_NAME = "srtatussvc";
+    public static final String SERVICE_NAME = "statussvc";
     public static final String ROOT_PACKAGE = SERVICE_PACKAGE + "." + SERVICE_NAME;
 
     // REST
