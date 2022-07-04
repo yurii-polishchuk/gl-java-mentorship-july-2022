@@ -1,0 +1,17 @@
+configuration:
+  status: warn
+  appenders:
+    console:
+      name: console
+      target: SYSTEM_OUT
+      patternLayout:
+        pattern: '%r %p %c %x - %m%n'
+  loggers:
+    asyncRoot:
+      level: info
+      includeLocation: true
+      appenderRef:
+        - ref: console
+    asynclogger:
+      - name: com.example
+        level: debug
