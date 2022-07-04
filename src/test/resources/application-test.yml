@@ -2,6 +2,16 @@
 spring:
   main:
     bannerMode: console
+  # Data source
+  dataSource:
+    url: test
+    username: test
+    password: test
+  jpa:
+    showSql: true
+  flyway:
+    baselineOnMigrate: false
+    enabled: false
 
 # Logging
 logging:

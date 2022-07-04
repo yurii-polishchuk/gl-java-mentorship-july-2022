@@ -50,6 +50,11 @@ dependencies {
     // Tracing
     implementation "org.springframework.cloud:spring-cloud-starter-sleuth"
 
+    // Data
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.flywaydb:flyway-core"
+    implementation "mysql:mysql-connector-java"
+
     // Commons, Utilities
     implementation "org.apache.commons:commons-lang3"
 
