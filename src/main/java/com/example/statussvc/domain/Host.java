@@ -23,5 +23,13 @@ public class Host implements Domain {
     @Id
     @GeneratedValue
     private Long id;
+    private String title;
+    private String description;
+    private String url;
+    private int connectionTime; //in ms
+    private String lastCheck;
+    private String status; //maybe enum like available/unavailable
+
+
 
 }
