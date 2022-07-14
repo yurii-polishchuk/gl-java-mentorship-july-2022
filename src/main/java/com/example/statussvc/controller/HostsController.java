@@ -19,13 +19,7 @@ import static com.example.statussvc.Constants.API_V1;
 @RequiredArgsConstructor
 @RequestMapping(API_V1)
 public class HostsController {
-
     private final Tracer tracer;
-
-    @GetMapping("/host/{id}")
-    public Host getHost(@PathVariable Long id) {
-        return HostsRepository.getHost(id).orElseThrow(new RestContractExceptionResponse());
-    }
 
     public Object create() {
         return null;
@@ -39,7 +33,10 @@ public class HostsController {
         return null;
     }
 
-    public Object retrieve() { return null; }
+    @GetMapping("/host/{id}")
+    public Host retrieve(@PathVariable Long id) {
+        return HostsRepository.getHost(id);
+    }
 
     public Object retrieveAll() {
         return null;

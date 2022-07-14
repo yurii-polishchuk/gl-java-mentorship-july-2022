@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class HostControllerTest {
     private final MockMvc mockMvc;
     private final Tracer tracer;
-
     @BeforeEach
     public void mockTracer() {
         var span = mock(Span.class);
@@ -45,7 +44,6 @@ public class HostControllerTest {
                         .build()
                 );
     }
-
     @Test
     @DisplayName("""
             GIVEN valid root endpoint
@@ -68,7 +66,57 @@ public class HostControllerTest {
                 .getResponse();
 
         // AND THEN
-        assertThat(actualResponse.getContentAsString()).containsOnlyDigits();
+        assertThat(!actualResponse.getContentAsString().isEmpty());
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN valid root endpoint
+            WHEN performing valid GET request
+            THEN return empty success response
+            """)
+    void HostEndpointNotValid() throws Exception {
+        // GIVEN
+
+        // WHEN
+        MockHttpServletResponse actualResponse = mockMvc.perform(get("/abc")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(StringUtils.EMPTY))
+
+                // THEN
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        // AND THEN
+        assertThat(actualResponse.getContentAsString().isEmpty());
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN valid root endpoint
+            WHEN performing valid GET request
+            THEN return empty success response
+            """)
+    void HostEndpointNotValidId() throws Exception {
+        // GIVEN
+
+        // WHEN
+        MockHttpServletResponse actualResponse = mockMvc.perform(get("/hosts/abc")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(StringUtils.EMPTY))
+
+                // THEN
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        // AND THEN
+        assertThat(actualResponse.getContentAsString().isEmpty());
     }
 
 }
