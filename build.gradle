@@ -76,10 +76,15 @@ java {
 }
 
 jar {
-    enabled = false
+    manifest {
+        attributes(
+                'Main-Class': 'com.example.statussvc.Application'
+        )
+    }
 }
 
 test {
+    //enabled = false
     useJUnitPlatform()
 }
 

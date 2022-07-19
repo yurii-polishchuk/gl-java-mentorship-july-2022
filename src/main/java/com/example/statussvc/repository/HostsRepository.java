@@ -10,6 +10,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface HostsRepository extends PagingAndSortingRepository<Host, Long> {
-
 }
 

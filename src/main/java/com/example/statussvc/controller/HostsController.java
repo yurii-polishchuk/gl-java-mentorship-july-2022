@@ -1,12 +1,20 @@
 package com.example.statussvc.controller;
 
 import brave.Tracer;
+import com.example.statussvc.service.HostsService;
+import com.example.statussvc.wire.request.HostCreate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.example.statussvc.Constants.API_V1;
+import javax.validation.Valid;
+import java.net.URI;
+
+import static com.example.statussvc.Constants.*;
 
 /**
  * Entry point for Hosts endpoint APIs.
@@ -14,13 +22,17 @@ import static com.example.statussvc.Constants.API_V1;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(API_V1)
+@RequestMapping(API_V1 + URL_SEPARATOR + HOSTS)
 public class HostsController {
 
     private final Tracer tracer;
+    private final HostsService hostsService;
 
-    public Object create() {
-        return null;
+    @PostMapping
+    public ResponseEntity<URI> create(@Valid @RequestBody HostCreate hostCreate) throws Exception {
+        Long id = hostsService.save(hostCreate);
+        URI uri = new URI(API_V1 + URL_SEPARATOR + HOSTS + URL_SEPARATOR + id);
+        return ResponseEntity.created(uri).build();
     }
 
     public Object replace() {
