@@ -1,8 +1,11 @@
 package com.example.statussvc.domain;
+
 import lombok.*;
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Main Host domain biz object
@@ -10,8 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@Data
-@Table(name = "URLS")
+@Table
 @Entity
 @Builder
 @NoArgsConstructor
@@ -19,21 +21,15 @@ import java.time.LocalDateTime;
 public class Host implements Domain {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID")
+    @GeneratedValue
     private Long id;
-    @Column(name = "TITLE")
     private String title;
-    @Column(name = "DESCRIPTION")
     private String description;
-    @Column(name = "URL")
-    @NotBlank(message = "URL is mandatory")
     private String url;
-    @Column(name = "CONNECTION_TIME")
-    private int connectionTime; // ms
-    @Column(name = "LAST_CHECK")
-    private LocalDateTime lastCheck;
-    @Column(name = "STATUS")
-    private String status; // available/unavailable
+    private int connectionTime; //in ms
+    private String lastCheck;
+    private String status; //maybe enum like available/unavailable
+
+
 
 }
