@@ -1,7 +1,7 @@
 package com.example.statussvc.mapper;
 
 import com.example.statussvc.domain.Host;
-import com.example.statussvc.wire.request.HostCreate;
+import com.example.statussvc.wire.request.HostCreateDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -19,6 +19,6 @@ public interface HostMapper {
     @Mapping(target = "lastCheck",
             expression = "java( new java.util.Date() )"
     )
-    Host HostCreateRequestToHost(HostCreate hostCreate);
-    HostCreate hostToHostCreateResponse(Host host);
+    Host HostCreateRequestToHost(HostCreateDto hostCreateDto);
+    HostCreateDto hostToHostCreateResponse(Host host);
 }

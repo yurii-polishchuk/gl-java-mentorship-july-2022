@@ -3,8 +3,9 @@ package com.example.statussvc.controller;
 import brave.Span;
 import brave.Tracer;
 import brave.propagation.TraceContext;
+import com.example.statussvc.Constants;
 import com.example.statussvc.service.HostsService;
-import com.example.statussvc.wire.request.HostCreate;
+import com.example.statussvc.wire.request.HostCreateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,13 +58,13 @@ public class HostsControllerTest {
 
     @Test
     @DisplayName("""
-            GIVEN valid hostCreate object
-            WHEN performing valid POST request
+            GIVEN valid hostCreateDto object
+            WHEN performing POST request
             THEN return response with code 201 and valid location
             """)
     void postCorrectData() throws Exception {
         // GIVEN
-        HostCreate hostCreate = HostCreate.builder()
+        HostCreateDto hostCreateDto = HostCreateDto.builder()
                 .title("Google")
                 .description("Google Description")
                 .url("https://google.com/")
@@ -75,10 +74,10 @@ public class HostsControllerTest {
         given(hostsService.save(any())).willReturn(100L);
         // WHEN
         MockHttpServletResponse actualResponse = mockMvc
-                .perform(post("https://localhost:8080/api/v1/hosts/")
+                .perform(post(Constants.API_V1 + Constants.URL_SEPARATOR + Constants.HOSTS)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(ow.writeValueAsString(hostCreate))
+                        .content(ow.writeValueAsString(hostCreateDto))
                 )
                 // THEN
                 .andExpect(status().isCreated())
@@ -89,6 +88,32 @@ public class HostsControllerTest {
         assertThat(actualResponse.getHeader("location")).isEqualTo("/api/v1/hosts/100");
     }
 
-
-
+    @Test
+    @DisplayName("""
+            GIVEN invalid hostCreateDto object
+            WHEN performing POST request
+            THEN return response with code 404 and message "Not Found"
+            """)
+    void postInvalidData() throws Exception {
+        // GIVEN
+        HostCreateDto hostCreateDto = HostCreateDto.builder()
+                .title("Google")
+                .description("Google Description")
+                .url(null)
+                .connectionTime(400)
+                .status("ACTIVE")
+                .build();
+        given(hostsService.save(any())).willReturn(101L);
+        // WHEN
+        mockMvc
+                .perform(post(Constants.API_V1 + Constants.URL_SEPARATOR + Constants.HOSTS)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(ow.writeValueAsString(hostCreateDto))
+                )
+                // THEN
+                .andExpect(status().isNotFound())
+                .andReturn()
+                .getResponse();
+    }
 }

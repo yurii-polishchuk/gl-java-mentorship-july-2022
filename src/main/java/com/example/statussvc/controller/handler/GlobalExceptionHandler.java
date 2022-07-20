@@ -2,12 +2,14 @@ package com.example.statussvc.controller.handler;
 
 import brave.Tracer;
 import com.example.statussvc.Constants;
+import com.example.statussvc.controller.handler.exceptions.ConflictException;
 import com.example.statussvc.wire.response.RestContractExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -30,6 +32,34 @@ public class GlobalExceptionHandler {
     private final Tracer tracer;
 
     /**
+     * Handler for ConflictException.
+     *
+     * @return {@link ResponseEntity} with status and body
+     */
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<RestContractExceptionResponse> handleConflictException(
+            ConflictException exception) {
+        return map(EXCEPTION_MAPPING.getOrDefault(exception.getClass(), HttpStatus.CONFLICT),
+                exception.getMessage(),
+                exception
+        );
+    }
+
+    /**
+     * Handler for MethodArgumentNotValidException
+     *
+     * @return {@link ResponseEntity} with status and body
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<RestContractExceptionResponse> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException exception) {
+        return map(EXCEPTION_MAPPING.getOrDefault(exception.getClass(), HttpStatus.NOT_FOUND),
+                exception.getMessage(),
+                exception
+        );
+    }
+
+    /**
      * Global exception Handler.
      *
      * @return {@link ResponseEntity} with status and body
@@ -41,8 +71,6 @@ public class GlobalExceptionHandler {
                 exception
         );
     }
-
-
 
     /**
      * Converts specific exceptions to meaningful response.

@@ -1,8 +1,9 @@
 package com.example.statussvc.controller;
 
 import brave.Tracer;
+import com.example.statussvc.controller.handler.exceptions.ConflictException;
 import com.example.statussvc.service.HostsService;
-import com.example.statussvc.wire.request.HostCreate;
+import com.example.statussvc.wire.request.HostCreateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 import static com.example.statussvc.Constants.*;
 
@@ -29,8 +31,8 @@ public class HostsController {
     private final HostsService hostsService;
 
     @PostMapping
-    public ResponseEntity<URI> create(@Valid @RequestBody HostCreate hostCreate) throws Exception {
-        Long id = hostsService.save(hostCreate);
+    public ResponseEntity<URI> create(@Valid @RequestBody HostCreateDto hostCreateDto) throws Exception {
+        Long id = hostsService.save(hostCreateDto);
         URI uri = new URI(API_V1 + URL_SEPARATOR + HOSTS + URL_SEPARATOR + id);
         return ResponseEntity.created(uri).build();
     }

@@ -10,8 +10,8 @@ spring:
   jpa:
     showSql: false
   flyway:
-    baselineOnMigrate: false
-    enabled: false
+    baselineOnMigrate: true
+    enabled: true
 
 # Logging
 logging:

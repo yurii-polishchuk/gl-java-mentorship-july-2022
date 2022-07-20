@@ -14,7 +14,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HostCreate implements Request {
+public class HostCreateDto implements Request {
     private Long id;
     @NotBlank(message = "Empty title")
     private String title;
