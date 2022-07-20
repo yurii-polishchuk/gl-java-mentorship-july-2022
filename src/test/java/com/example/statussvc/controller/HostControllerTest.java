@@ -17,15 +17,20 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = RootController.class)
+@WebMvcTest(controllers = HostsController.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @MockBean(Tracer.class)
@@ -46,43 +51,49 @@ public class HostControllerTest {
     }
     @Test
     @DisplayName("""
-            GIVEN valid root endpoint
+            GIVEN valid endpoint
             WHEN performing valid GET request
-            THEN return empty success response
+            THEN return success response as list of all hosts
             """)
-    void HostEndpointPositive() throws Exception {
-        // GIVEN
-
-        // WHEN
-        MockHttpServletResponse actualResponse = mockMvc.perform(get("/hosts")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(StringUtils.EMPTY))
-
-                // THEN
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse();
-
-        // AND THEN
-        assertThat(!actualResponse.getContentAsString().isEmpty());
+    void ValidHostsEndpoint() throws Exception {
+         this.mockMvc
+                 .perform(MockMvcRequestBuilders
+                 .get("/hosts")
+                 .accept(MediaType.APPLICATION_JSON))
+                 .andDo(print())
+                 .andExpect(status().isOk())
+                 .andExpect(MockMvcResultMatchers.jsonPath("$.hosts").exists())
+                 .andExpect(MockMvcResultMatchers.jsonPath("$.hosts[*].id").isNotEmpty());
     }
 
     @Test
     @DisplayName("""
-            GIVEN valid root endpoint
+            GIVEN valid endpoint
             WHEN performing valid GET request
-            THEN return empty success response
+            THEN return success response
+            """)
+    void HostEndpointWithValidId() throws Exception {
+        this.mockMvc
+                .perform(get("/hosts/1", 1))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect((ResultMatcher) jsonPath("$.id").value("1"));
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN invalid endpoint
+            WHEN performing valid GET request
+            THEN return Not Found response
             """)
     void HostEndpointNotValid() throws Exception {
         // GIVEN
 
         // WHEN
-        MockHttpServletResponse actualResponse = mockMvc.perform(get("/abc")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(StringUtils.EMPTY))
+        MockHttpServletResponse actualResponse = mockMvc.perform(get("/bad_hosts")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(StringUtils.EMPTY))
 
                 // THEN
                 .andExpect(status().isNotFound())
@@ -91,32 +102,32 @@ public class HostControllerTest {
                 .getResponse();
 
         // AND THEN
-        assertThat(actualResponse.getContentAsString().isEmpty());
+        assertThat(actualResponse.getStatus() == 404);
     }
 
     @Test
     @DisplayName("""
-            GIVEN valid root endpoint
-            WHEN performing valid GET request
-            THEN return empty success response
+            GIVEN valid endpoint
+            WHEN performing not valid GET request
+            THEN return Bad Request response
             """)
-    void HostEndpointNotValidId() throws Exception {
+    void HRequestIsNotValid() throws Exception {
         // GIVEN
 
         // WHEN
-        MockHttpServletResponse actualResponse = mockMvc.perform(get("/hosts/abc")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(StringUtils.EMPTY))
+        MockHttpServletResponse actualResponse = mockMvc.perform(get("/hosts?")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(StringUtils.EMPTY))
 
                 // THEN
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
 
         // AND THEN
-        assertThat(actualResponse.getContentAsString().isEmpty());
+        assertThat(actualResponse.getStatus() == 400);
     }
 
 }

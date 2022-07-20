@@ -6,10 +6,15 @@ import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.response.RestContractExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jetty.http.MetaData;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.statussvc.Constants.API_V1;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+
+import static com.example.statussvc.Constants.*;
 
 /**
  * Entry point for Hosts endpoint APIs.
@@ -33,9 +38,10 @@ public class HostsController {
         return null;
     }
 
-    @GetMapping("/host/{id}")
-    public Host retrieve(@PathVariable Long id) {
-        return HostsRepository.getHost(id);
+    @GetMapping("/hosts/{id}")
+    public ResponseEntity<URL> retrieve(@PathVariable("id") Long id) throws URISyntaxException {
+        URI uri = new URI(API_V1 + "/hosts" + URL_SEPARATOR + id);
+        return ResponseEntity.created(uri).build();
     }
 
     public Object retrieveAll() {
