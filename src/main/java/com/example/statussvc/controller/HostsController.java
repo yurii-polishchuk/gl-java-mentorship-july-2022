@@ -1,10 +1,15 @@
 package com.example.statussvc.controller;
 
 import brave.Tracer;
+import com.example.statussvc.domain.Host;
+import com.example.statussvc.repository.HostsRepository;
+import com.example.statussvc.wire.response.RestContractExceptionResponse;
+import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.jetty.http.MetaData;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.example.statussvc.Constants.API_V1;
 
@@ -31,8 +36,9 @@ public class HostsController {
         return null;
     }
 
-    public Object retrieve() {
-        return null;
+    @GetMapping("/host/{id}")
+    public ResponseEntity<RetrieveHostResponse> retrieve(@PathVariable Long id) {
+        return RetrieveHostResponse.findById(id);
     }
 
     public Object retrieveAll() {

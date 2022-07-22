@@ -4,9 +4,10 @@ spring:
     bannerMode: console
   # Data source
   dataSource:
-    url: test
-    username: test
-    password: test
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/db
+    username: user
+    password: password
   jpa:
     showSql: true
   flyway:
