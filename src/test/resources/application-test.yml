@@ -4,9 +4,9 @@ spring:
     bannerMode: console
   # Data source
   dataSource:
-    url: test
-    username: test
-    password: test
+    url: jdbc:mysql://localhost:3306/${spring.application.name}db
+    username: root
+    password: Password_23
   jpa:
     showSql: true
   flyway:

@@ -6,12 +6,12 @@ spring:
   dataSource:
     url: jdbc:mysql://localhost:3306/${spring.application.name}db
     username: root
-    password: password
+    password: Password_23
   jpa:
     showSql: true
   flyway:
-    baselineOnMigrate: false
-    enabled: false
+    baselineOnMigrate: true
+    enabled: true
 
 # Logging
 logging:

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -30,12 +31,25 @@ public class GlobalExceptionHandler {
     private final Tracer tracer;
 
     /**
+     * Handler for MethodArgumentNotValidException
+     *
+     * @return {@link ResponseEntity} with status and body
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<RestContractExceptionResponse> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException exception) {
+        return map(HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                exception
+        );
+    }
+
+    /**
      * Global exception Handler.
      *
      * @return {@link ResponseEntity} with status and body
      */
     @ExceptionHandler
-    @SuppressWarnings("unused")
     public ResponseEntity<RestContractExceptionResponse> handleThrowable(Throwable exception) {
         return map(EXCEPTION_MAPPING.getOrDefault(exception.getClass(), HttpStatus.INTERNAL_SERVER_ERROR),
                 exception.getMessage(),
