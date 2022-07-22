@@ -2,7 +2,6 @@ package com.example.statussvc.controller.handler;
 
 import brave.Tracer;
 import com.example.statussvc.Constants;
-import com.example.statussvc.controller.handler.exceptions.ConflictException;
 import com.example.statussvc.wire.response.RestContractExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,20 +31,6 @@ public class GlobalExceptionHandler {
     private final Tracer tracer;
 
     /**
-     * Handler for ConflictException.
-     *
-     * @return {@link ResponseEntity} with status and body
-     */
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<RestContractExceptionResponse> handleConflictException(
-            ConflictException exception) {
-        return map(EXCEPTION_MAPPING.getOrDefault(exception.getClass(), HttpStatus.CONFLICT),
-                exception.getMessage(),
-                exception
-        );
-    }
-
-    /**
      * Handler for MethodArgumentNotValidException
      *
      * @return {@link ResponseEntity} with status and body
@@ -53,7 +38,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<RestContractExceptionResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException exception) {
-        return map(EXCEPTION_MAPPING.getOrDefault(exception.getClass(), HttpStatus.NOT_FOUND),
+        return map(HttpStatus.BAD_REQUEST,
                 exception.getMessage(),
                 exception
         );

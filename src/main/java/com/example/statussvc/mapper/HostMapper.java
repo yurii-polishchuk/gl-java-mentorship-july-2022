@@ -1,11 +1,8 @@
 package com.example.statussvc.mapper;
 
 import com.example.statussvc.domain.Host;
-import com.example.statussvc.wire.request.HostCreateDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValueCheckStrategy;
-import org.mapstruct.ReportingPolicy;
+import com.example.statussvc.wire.request.HostCreateRequest;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(
@@ -13,12 +10,12 @@ import org.mapstruct.factory.Mappers;
         unmappedTargetPolicy = ReportingPolicy.ERROR,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
 )
-public interface HostMapper {
+public abstract class HostMapper {
 
-    HostMapper INSTANCE = Mappers.getMapper(HostMapper.class);
-    @Mapping(target = "lastCheck",
-            expression = "java( new java.util.Date() )"
-    )
-    Host HostCreateRequestToHost(HostCreateDto hostCreateDto);
-    HostCreateDto hostToHostCreateResponse(Host host);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "connectionTime", ignore = true)
+    @Mapping(target = "lastCheck", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    public abstract Host hostCreateRequestToHost(HostCreateRequest hostCreateRequest);
 }

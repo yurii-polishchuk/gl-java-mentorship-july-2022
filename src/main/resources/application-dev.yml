@@ -8,7 +8,7 @@ spring:
     username: root
     password: Password_23
   jpa:
-    showSql: false
+    showSql: true
   flyway:
     baselineOnMigrate: true
     enabled: true

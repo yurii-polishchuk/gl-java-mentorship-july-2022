@@ -28,10 +28,11 @@ public class Host implements Domain {
     @NotNull
     private String url;
     @NotNull
-    @Min(1)
+    @Min(0)
     private Integer connectionTime;
     @NotNull
     private Date lastCheck;
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
 }

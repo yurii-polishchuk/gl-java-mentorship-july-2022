@@ -3,9 +3,8 @@ package com.example.statussvc.controller;
 import brave.Span;
 import brave.Tracer;
 import brave.propagation.TraceContext;
-import com.example.statussvc.Constants;
 import com.example.statussvc.service.HostsService;
-import com.example.statussvc.wire.request.HostCreateDto;
+import com.example.statussvc.wire.request.HostCreateRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,26 +56,24 @@ public class HostsControllerTest {
 
     @Test
     @DisplayName("""
-            GIVEN valid hostCreateDto object
+            GIVEN valid hostCreateRequest object
             WHEN performing POST request
-            THEN return response with code 201 and valid location
+            THEN return response with code 201, valid location and empty body
             """)
     void postCorrectData() throws Exception {
         // GIVEN
-        HostCreateDto hostCreateDto = HostCreateDto.builder()
+        HostCreateRequest hostCreateRequest = HostCreateRequest.builder()
                 .title("Google")
                 .description("Google Description")
                 .url("https://google.com/")
-                .connectionTime(400)
-                .status("ACTIVE")
                 .build();
-        given(hostsService.save(any())).willReturn(100L);
+        given(hostsService.create(hostCreateRequest)).willReturn(100L);
         // WHEN
         MockHttpServletResponse actualResponse = mockMvc
-                .perform(post(Constants.API_V1 + Constants.URL_SEPARATOR + Constants.HOSTS)
+                .perform(post("/api/v1/hosts")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(ow.writeValueAsString(hostCreateDto))
+                        .content(ow.writeValueAsString(hostCreateRequest))
                 )
                 // THEN
                 .andExpect(status().isCreated())
@@ -86,34 +82,31 @@ public class HostsControllerTest {
         // AND THEN
         assertThat(actualResponse.containsHeader("location")).isTrue();
         assertThat(actualResponse.getHeader("location")).isEqualTo("/api/v1/hosts/100");
+        assertThat(actualResponse.getContentAsString()).isEmpty();
     }
 
     @Test
     @DisplayName("""
-            GIVEN invalid hostCreateDto object
+            GIVEN invalid hostCreateRequest object
             WHEN performing POST request
-            THEN return response with code 404 and message "Not Found"
+            THEN return response with code 400 and message "Bad Request"
             """)
     void postInvalidData() throws Exception {
         // GIVEN
-        HostCreateDto hostCreateDto = HostCreateDto.builder()
+        HostCreateRequest hostCreateRequest = HostCreateRequest.builder()
                 .title("Google")
                 .description("Google Description")
                 .url(null)
-                .connectionTime(400)
-                .status("ACTIVE")
                 .build();
-        given(hostsService.save(any())).willReturn(101L);
+        given(hostsService.create(hostCreateRequest)).willReturn(101L);
         // WHEN
         mockMvc
-                .perform(post(Constants.API_V1 + Constants.URL_SEPARATOR + Constants.HOSTS)
+                .perform(post("/api/v1/hosts")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(ow.writeValueAsString(hostCreateDto))
+                        .content(ow.writeValueAsString(hostCreateRequest))
                 )
                 // THEN
-                .andExpect(status().isNotFound())
-                .andReturn()
-                .getResponse();
+                .andExpect(status().isBadRequest());
     }
 }

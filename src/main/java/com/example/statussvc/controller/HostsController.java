@@ -1,9 +1,8 @@
 package com.example.statussvc.controller;
 
 import brave.Tracer;
-import com.example.statussvc.controller.handler.exceptions.ConflictException;
 import com.example.statussvc.service.HostsService;
-import com.example.statussvc.wire.request.HostCreateDto;
+import com.example.statussvc.wire.request.HostCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
 
 import static com.example.statussvc.Constants.*;
 
@@ -24,17 +22,17 @@ import static com.example.statussvc.Constants.*;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(API_V1 + URL_SEPARATOR + HOSTS)
+@RequestMapping(API_V1 + URL_SEPARATOR + "hosts")
 public class HostsController {
 
     private final Tracer tracer;
     private final HostsService hostsService;
 
     @PostMapping
-    public ResponseEntity<URI> create(@Valid @RequestBody HostCreateDto hostCreateDto) throws Exception {
-        Long id = hostsService.save(hostCreateDto);
-        URI uri = new URI(API_V1 + URL_SEPARATOR + HOSTS + URL_SEPARATOR + id);
-        return ResponseEntity.created(uri).build();
+    public ResponseEntity<URI> create(@Valid @RequestBody HostCreateRequest hostCreateRequest) {
+        return ResponseEntity.created(
+                URI.create(API_V1 + URL_SEPARATOR + "hosts" + URL_SEPARATOR + hostsService.create(hostCreateRequest))
+        ).build();
     }
 
     public Object replace() {

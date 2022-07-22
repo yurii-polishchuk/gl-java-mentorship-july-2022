@@ -1,16 +1,16 @@
 package com.example.statussvc.service;
 
-import com.example.statussvc.controller.handler.exceptions.ConflictException;
 import com.example.statussvc.domain.Host;
+import com.example.statussvc.domain.Status;
 import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
-import com.example.statussvc.wire.request.HostCreateDto;
+import com.example.statussvc.wire.request.HostCreateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
-import java.util.Optional;
+import java.util.Date;
 
 /**
  * CRUD operations for Hosts Management.
@@ -20,12 +20,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class HostsService {
     private final HostsRepository hostsRepository;
+    private final HostMapper hostMapper;
 
-    public Long save(@Valid HostCreateDto hostCreateDto) {
-        Host mappedHost = HostMapper.INSTANCE.HostCreateRequestToHost(hostCreateDto);
-        if (mappedHost.getId() != null && hostsRepository.existsById(mappedHost.getId())) {
-            throw new ConflictException(String.format("Host with id=%d already exists!", mappedHost.getId()));
-        }
+    public Long create(HostCreateRequest hostCreateRequest) {
+        Host mappedHost = hostMapper.hostCreateRequestToHost(hostCreateRequest);
+        mappedHost.setConnectionTime(0);
+        mappedHost.setLastCheck(new Date());
+        mappedHost.setStatus(Status.INACTIVE);
         return hostsRepository.save(mappedHost).getId();
     }
 
