@@ -4,8 +4,10 @@ import brave.Tracer;
 import com.example.statussvc.domain.Host;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.response.RestContractExceptionResponse;
+import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jetty.http.MetaData;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,7 @@ import static com.example.statussvc.Constants.API_V1;
 @RequiredArgsConstructor
 @RequestMapping(API_V1)
 public class HostsController {
+
     private final Tracer tracer;
 
     public Object create() {
@@ -34,8 +37,8 @@ public class HostsController {
     }
 
     @GetMapping("/host/{id}")
-    public Host retrieve(@PathVariable Long id) {
-        return HostsRepository.getHost(id);
+    public ResponseEntity<RetrieveHostResponse> retrieve(@PathVariable Long id) {
+        return RetrieveHostResponse.findById(id);
     }
 
     public Object retrieveAll() {
