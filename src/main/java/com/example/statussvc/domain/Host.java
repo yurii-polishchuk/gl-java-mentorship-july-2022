@@ -1,5 +1,6 @@
 package com.example.statussvc.domain;
 
+<<<<<<< HEAD
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -32,4 +33,9 @@ public class Host implements Domain {
 
 
 
+=======
+import com.example.statussvc.domain.Domain;
+
+public class Host implements Domain {
+>>>>>>> second attempt to enhance my previous pull requests
 }
