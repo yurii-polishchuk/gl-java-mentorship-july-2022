@@ -27,9 +27,7 @@ public class Host implements Domain {
     private String description;
     @NotNull
     private String url;
-    @NotNull
     private Duration connectionTime;
-    @NotNull
     private LocalDateTime lastCheck;
     @NotNull
     @Enumerated(EnumType.STRING)

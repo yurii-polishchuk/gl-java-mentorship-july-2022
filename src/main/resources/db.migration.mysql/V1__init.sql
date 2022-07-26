@@ -1,10 +1,10 @@
- create table if not exists host (
+ create table host (
     id bigint not null,
     title varchar(100) not null,
     description varchar(1024),
     url varchar(1024) not null,
-    connection_time bigint not null,
-    last_check timestamp not null,
+    connection_time int,
+    last_check timestamp,
     status varchar(15) not null,
     primary key (id)
 ) ENGINE = InnoDB

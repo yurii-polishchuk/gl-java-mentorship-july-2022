@@ -6,12 +6,12 @@ import brave.propagation.TraceContext;
 import com.example.statussvc.service.HostsService;
 import com.example.statussvc.wire.request.HostCreateRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -33,16 +33,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = HostsController.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@MockBean(Tracer.class)
-@MockBean(HostsService.class)
+@MockBean(
+        classes = {
+                HostsService.class,
+                Tracer.class
+        },
+        answer = Answers.RETURNS_SMART_NULLS
+)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class HostsControllerTest {
     private final MockMvc mockMvc;
     private final Tracer tracer;
-    @Autowired
     private final HostsService hostsService;
 
-    private final ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+    @Autowired
+    private final ObjectMapper objectMapper;
 
     @BeforeEach
     public void mockTracer() {
@@ -75,7 +80,7 @@ public class HostsControllerTest {
                 .perform(post("/api/v1/hosts")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(ow.writeValueAsString(hostCreateRequest))
+                        .content(objectMapper.writeValueAsString(hostCreateRequest))
                 )
                 // THEN
                 .andExpect(status().isCreated())
@@ -108,7 +113,7 @@ public class HostsControllerTest {
                 .perform(post("/api/v1/hosts")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(ow.writeValueAsString(hostCreateRequest))
+                        .content(objectMapper.writeValueAsString(hostCreateRequest))
                 )
                 // THEN
                 .andExpect(status().isBadRequest());

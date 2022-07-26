@@ -22,7 +22,7 @@ spring:
         jdbc:
           time_zone: UTC
     hibernate:
-      ddlAuto: validate # update to validate
+      ddlAuto: update
   # Flyway
   flyway:
     enabled: false

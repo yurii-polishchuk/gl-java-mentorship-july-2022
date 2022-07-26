@@ -50,6 +50,7 @@ public class GlobalExceptionHandler {
      * @return {@link ResponseEntity} with status and body
      */
     @ExceptionHandler
+    @SuppressWarnings("unused")
     public ResponseEntity<RestContractExceptionResponse> handleThrowable(Throwable exception) {
         return map(EXCEPTION_MAPPING.getOrDefault(exception.getClass(), HttpStatus.INTERNAL_SERVER_ERROR),
                 exception.getMessage(),

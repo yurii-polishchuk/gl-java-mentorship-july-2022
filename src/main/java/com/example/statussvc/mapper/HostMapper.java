@@ -18,9 +18,9 @@ public abstract class HostMapper {
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "connectionTime", ignore = true, expression = "java( java.time.Duration.ZERO )"),
-            @Mapping(target = "lastCheck", ignore = true, expression = "java( java.time.LocalDateTime.now() )"),
-            @Mapping(target = "status", ignore = true, expression = "java( com.example.statussvc.domain.Status.INACTIVE)")
+            @Mapping(target = "connectionTime", ignore = true),
+            @Mapping(target = "lastCheck", ignore = true),
+            @Mapping(target = "status", expression = "java( com.example.statussvc.domain.Status.UNKNOWN)")
     })
     public abstract Host hostCreateRequestToHost(HostCreateRequest hostCreateRequest);
 }
