@@ -3,9 +3,9 @@ package com.example.statussvc.domain;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 /**
  * Main Host domain biz object
@@ -28,10 +28,9 @@ public class Host implements Domain {
     @NotNull
     private String url;
     @NotNull
-    @Min(0)
-    private Integer connectionTime;
+    private Duration connectionTime;
     @NotNull
-    private Date lastCheck;
+    private LocalDateTime lastCheck;
     @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;

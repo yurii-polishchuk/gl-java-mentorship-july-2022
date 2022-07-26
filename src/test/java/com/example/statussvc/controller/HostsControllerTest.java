@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
@@ -62,6 +63,7 @@ public class HostsControllerTest {
             """)
     void postCorrectData() throws Exception {
         // GIVEN
+        final String EXPECTED_RESPONSE_URL = "/api/v1/hosts/100";
         HostCreateRequest hostCreateRequest = HostCreateRequest.builder()
                 .title("Google")
                 .description("Google Description")
@@ -80,8 +82,10 @@ public class HostsControllerTest {
                 .andReturn()
                 .getResponse();
         // AND THEN
-        assertThat(actualResponse.containsHeader("location")).isTrue();
-        assertThat(actualResponse.getHeader("location")).isEqualTo("/api/v1/hosts/100");
+        assertThat(actualResponse.getHeader(HttpHeaders.LOCATION))
+                .isNotEmpty()
+                .isEqualTo(EXPECTED_RESPONSE_URL);
+        assertThat(actualResponse.getHeader("location")).isEqualTo(EXPECTED_RESPONSE_URL);
         assertThat(actualResponse.getContentAsString()).isEmpty();
     }
 

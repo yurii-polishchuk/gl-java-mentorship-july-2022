@@ -24,7 +24,6 @@ import static com.example.statussvc.Constants.*;
 @RequiredArgsConstructor
 @RequestMapping(API_V1 + URL_SEPARATOR + "hosts")
 public class HostsController {
-
     private final Tracer tracer;
     private final HostsService hostsService;
 

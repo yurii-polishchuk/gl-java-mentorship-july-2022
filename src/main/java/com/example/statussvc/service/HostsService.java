@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
-import java.util.Date;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 /**
  * CRUD operations for Hosts Management.
@@ -24,9 +24,6 @@ public class HostsService {
 
     public Long create(HostCreateRequest hostCreateRequest) {
         Host mappedHost = hostMapper.hostCreateRequestToHost(hostCreateRequest);
-        mappedHost.setConnectionTime(0);
-        mappedHost.setLastCheck(new Date());
-        mappedHost.setStatus(Status.INACTIVE);
         return hostsRepository.save(mappedHost).getId();
     }
 
