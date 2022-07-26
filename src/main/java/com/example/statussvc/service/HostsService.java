@@ -1,11 +1,10 @@
 package com.example.statussvc.service;
 
-import com.example.statussvc.domain.type.Host;
 import com.example.statussvc.repository.HostsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.statussvc.controller.handler.HttpClientErrorNotFoundException;
 
 /**
  * CRUD operations for Hosts Management.
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class HostsService {
 
-    @Autowired
     private final HostsRepository hostsRepository;
 
     public Object create() {
@@ -31,7 +29,12 @@ public class HostsService {
     }
 
     public Host retrieve(Long id) {
-        return hostsRepository.findById(id).orElseThrow();
+        try {
+            return hostsRepository.findById(id)
+                    .orElseThrow(() -> new HttpClientErrorNotFoundException("Host not found"));
+        } catch (HttpClientErrorNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Object retrieveAll() {

@@ -1,4 +1,5 @@
 package com.example.statussvc.controller;
+
 import brave.Span;
 import brave.Tracer;
 import brave.propagation.TraceContext;
@@ -51,7 +52,7 @@ public class HostControllerTest {
                 );
     }
     @Test
-    @DisplayName("get endpoint with existing id")
+    @DisplayName("get endpoint with existing id - expected 200 OK")
     void HostByExistedId() throws Exception {
         this.mockMvc.perform( MockMvcRequestBuilders
                 .get("/hosts/{id}", 1)
@@ -59,6 +60,12 @@ public class HostControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1));
+    }
+
+    @Test
+    @DisplayName("get endpoint with not existing id - expected 404 Not Found")
+    void HostByNotExistedId() throws Exception {
+
     }
 
 }
