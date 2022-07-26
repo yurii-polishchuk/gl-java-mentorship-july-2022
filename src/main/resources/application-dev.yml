@@ -6,7 +6,7 @@ spring:
   dataSource:
     url: jdbc:mysql://localhost:3306/${spring.application.name}db
     username: root
-    password: Password_23
+    password: password
   jpa:
     showSql: true
   flyway:
