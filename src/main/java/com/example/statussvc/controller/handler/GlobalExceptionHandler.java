@@ -13,7 +13,11 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+<<<<<<< HEAD
 import org.springframework.web.client.HttpStatusCodeException;
+=======
+import org.springframework.web.client.HttpClientErrorException;
+>>>>>>> 469af82 (First Commit!)
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -78,6 +82,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
+<<<<<<< HEAD
      * Not readable request data exception handler.
      *
      * @param exception {@link HttpMessageNotReadableException} to catch and extract meaningful response
@@ -87,6 +92,33 @@ public class GlobalExceptionHandler {
     @SuppressWarnings("unused")
     public ResponseEntity<RestContractExceptionResponse> handleBindException(HttpMessageNotReadableException exception) {
         return map(HttpStatus.BAD_REQUEST, "Invalid request body received", exception);
+=======
+     * Handler for HttpClientErrorException.NotFound
+     *
+     * @return {@link ResponseEntity} with status and body
+     */
+    @ExceptionHandler(HttpClientErrorException.NotFound.class)
+    public ResponseEntity<RestContractExceptionResponse> handleNotFoundException(
+            HttpClientErrorException.NotFound exception) {
+        return map(HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                exception
+        );
+    }
+
+    /**
+     * Handler for IllegalArgumentException
+     *
+     * @return {@link ResponseEntity} with status and body
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<RestContractExceptionResponse> handleIllegalArgumentException(
+            IllegalArgumentException exception) {
+        return map(HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                exception
+        );
+>>>>>>> 469af82 (First Commit!)
     }
 
     /**
