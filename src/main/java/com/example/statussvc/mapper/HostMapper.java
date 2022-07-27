@@ -1,12 +1,9 @@
 package com.example.statussvc.mapper;
 
 import com.example.statussvc.domain.Host;
-import com.example.statussvc.domain.Status;
 import com.example.statussvc.wire.request.HostCreateRequest;
+import com.example.statussvc.wire.response.HostRetrieveAllResponse;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
-
-import java.time.Duration;
 
 @Mapper(
         componentModel = "spring",
@@ -23,4 +20,6 @@ public abstract class HostMapper {
             @Mapping(target = "status", expression = "java( com.example.statussvc.domain.Status.UNKNOWN)")
     })
     public abstract Host hostCreateRequestToHost(HostCreateRequest hostCreateRequest);
+
+    public abstract HostRetrieveAllResponse hostToHostRetrieveAllResponse(Host host);
 }

@@ -11,6 +11,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -38,6 +39,34 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<RestContractExceptionResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException exception) {
+        return map(HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                exception
+        );
+    }
+
+    /**
+     * Handler for HttpClientErrorException.NotFound
+     *
+     * @return {@link ResponseEntity} with status and body
+     */
+    @ExceptionHandler(HttpClientErrorException.NotFound.class)
+    public ResponseEntity<RestContractExceptionResponse> handleNotFoundException(
+            HttpClientErrorException.NotFound exception) {
+        return map(HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                exception
+        );
+    }
+
+    /**
+     * Handler for IllegalArgumentException
+     *
+     * @return {@link ResponseEntity} with status and body
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<RestContractExceptionResponse> handleIllegalArgumentException(
+            IllegalArgumentException exception) {
         return map(HttpStatus.BAD_REQUEST,
                 exception.getMessage(),
                 exception
