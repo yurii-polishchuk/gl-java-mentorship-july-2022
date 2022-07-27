@@ -36,7 +36,7 @@ public class HostsController {
     }
 
     @GetMapping("/host/{id}")
-    public ResponseEntity<RetrieveHostResponse> retrieve(@PathVariable Long id) {
+    public ResponseEntity<RetrieveHostResponse> retrieve(@PathVariable Long id) throws Exception {
         return hostsService.retrieve(id);
     }
 
