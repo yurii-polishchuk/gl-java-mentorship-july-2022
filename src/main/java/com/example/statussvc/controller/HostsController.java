@@ -2,16 +2,14 @@ package com.example.statussvc.controller;
 
 import brave.Tracer;
 import com.example.statussvc.service.HostsService;
-<<<<<<< HEAD
 import com.example.statussvc.wire.request.CreateHostRequest;
-=======
-import com.example.statussvc.wire.request.HostCreateRequest;
-import com.example.statussvc.wire.response.HostRetrieveAllResponse;
->>>>>>> 469af82 (First Commit!)
+import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.example.statussvc.Constants.API_V1;
 import static com.example.statussvc.Constants.URL_SEPARATOR;
@@ -35,10 +31,14 @@ import static com.example.statussvc.Constants.URL_SEPARATOR;
 public class HostsController {
 
     private static final String HOSTS_ENDPOINT = "/hosts";
+    @SuppressWarnings("unused")
     private static final String HOST_ENDPOINT = HOSTS_ENDPOINT + "/{id}";
+    public static final int DEFAULT_PAGE_SIZE = 3;
 
     private final Tracer tracer;
     private final HostsService hostsService;
+
+
 
     /**
      * POST to create Host entry.
@@ -69,21 +69,20 @@ public class HostsController {
         return null;
     }
 
-    @GetMapping
-    public ResponseEntity<Map<String, Object>> retrieveAll(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "3") int size
+    /**
+     * GET to retrieve All Host entries.
+     *
+     * @param pageable {@link Pageable}
+     * @return {@link ResponseEntity} with {@link Page} of {@link RetrieveAllHostsResponse} objects
+     */
+    @GetMapping(path = HOSTS_ENDPOINT)
+    public ResponseEntity<Page<RetrieveAllHostsResponse>> retrieveAll(
+            @PageableDefault(size = DEFAULT_PAGE_SIZE)
+            @SortDefault.SortDefaults(
+                    @SortDefault(sort = "id", direction = Sort.Direction.ASC)
+            ) Pageable pageable
     ) {
-        Pageable paging = PageRequest.of(page, size);
-        Page<HostRetrieveAllResponse> pageRetrieveAllHostResponses = hostsService.retrieveAll(paging);
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("hosts", pageRetrieveAllHostResponses.getContent());
-        response.put("currentPage", pageRetrieveAllHostResponses.getNumber());
-        response.put("totalItems", pageRetrieveAllHostResponses.getTotalElements());
-        response.put("totalPages", pageRetrieveAllHostResponses.getTotalPages());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(hostsService.retrieveAll(pageable));
     }
 
     public Object remove() {
