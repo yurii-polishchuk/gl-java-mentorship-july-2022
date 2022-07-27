@@ -3,9 +3,16 @@ package com.example.statussvc.service;
 import com.example.statussvc.domain.Host;
 import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
+<<<<<<< HEAD
 import com.example.statussvc.wire.request.CreateHostRequest;
+=======
+import com.example.statussvc.wire.request.HostCreateRequest;
+import com.example.statussvc.wire.response.HostRetrieveAllResponse;
+>>>>>>> 469af82 (First Commit!)
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -43,8 +50,8 @@ public class HostsService {
         return null;
     }
 
-    public Object retrieveAll() {
-        return null;
+    public Page<HostRetrieveAllResponse> retrieveAll(Pageable paging) {
+        return hostsRepository.findAll(paging).map(hostMapper::hostToHostRetrieveAllResponse);
     }
 
     public Object remove() {
