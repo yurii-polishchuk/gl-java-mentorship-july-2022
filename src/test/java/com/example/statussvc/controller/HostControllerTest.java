@@ -4,9 +4,11 @@ import brave.Span;
 import brave.Tracer;
 import brave.propagation.TraceContext;
 import com.example.statussvc.service.HostsService;
-import com.example.statussvc.wire.request.HostCreateRequest;
+import com.example.statussvc.wire.response.RestContractExceptionResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Objects;
+
+import static com.example.statussvc.controller.HostControllerFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -41,13 +46,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         answer = Answers.RETURNS_SMART_NULLS
 )
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class HostsControllerTest {
+class HostControllerTest {
+
     private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
+
     private final Tracer tracer;
     private final HostsService hostsService;
-
-    @Autowired
-    private final ObjectMapper objectMapper;
 
     @BeforeEach
     public void mockTracer() {
@@ -62,60 +67,68 @@ public class HostsControllerTest {
 
     @Test
     @DisplayName("""
-            GIVEN valid hostCreateRequest object
+            GIVEN valid createHostRequest object
             WHEN performing POST request
             THEN return response with code 201, valid location and empty body
             """)
-    void postCorrectData() throws Exception {
+    void createHostValid() throws Exception {
         // GIVEN
-        final String EXPECTED_RESPONSE_URL = "/api/v1/hosts/100";
-        HostCreateRequest hostCreateRequest = HostCreateRequest.builder()
-                .title("Google")
-                .description("Google Description")
-                .url("https://google.com/")
-                .build();
-        given(hostsService.create(hostCreateRequest)).willReturn(100L);
+        given(hostsService.create(CREATE_HOST_REQUEST)).willReturn(HOST_ID_VALID);
+
         // WHEN
         MockHttpServletResponse actualResponse = mockMvc
-                .perform(post("/api/v1/hosts")
+                .perform(post(HOSTS_URL_VALID)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(hostCreateRequest))
+                        .content(toJson(CREATE_HOST_REQUEST))
                 )
                 // THEN
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse();
+
         // AND THEN
         assertThat(actualResponse.getHeader(HttpHeaders.LOCATION))
                 .isNotEmpty()
-                .isEqualTo(EXPECTED_RESPONSE_URL);
-        assertThat(actualResponse.getHeader("location")).isEqualTo(EXPECTED_RESPONSE_URL);
+                .isEqualTo(EXPECTED_CREATED_URL);
         assertThat(actualResponse.getContentAsString()).isEmpty();
     }
 
     @Test
     @DisplayName("""
-            GIVEN invalid hostCreateRequest object
+            GIVEN invalid createHostRequest object
             WHEN performing POST request
             THEN return response with code 400 and message "Bad Request"
             """)
-    void postInvalidData() throws Exception {
+    void createHostBadRequest() throws Exception {
         // GIVEN
-        HostCreateRequest hostCreateRequest = HostCreateRequest.builder()
-                .title("Google")
-                .description("Google Description")
-                .url(null)
-                .build();
-        given(hostsService.create(hostCreateRequest)).willReturn(101L);
+
         // WHEN
-        mockMvc
-                .perform(post("/api/v1/hosts")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(hostCreateRequest))
-                )
-                // THEN
-                .andExpect(status().isBadRequest());
+        RestContractExceptionResponse actualResponse = fromJson(mockMvc
+                        .perform(post(HOSTS_URL_VALID)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(CREATE_HOST_REQUEST_INVALID)
+                        )
+                        // THEN
+                        .andExpect(status().isBadRequest())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                RestContractExceptionResponse.class);
+
+        // AND THEN
+        assertThat(actualResponse.message()).isEqualTo(CREATE_HOST_RESPONSE_BAD_REQUEST_MESSAGE);
     }
+
+    @SneakyThrows(JsonProcessingException.class)
+    private String toJson(Object object) {
+        return objectMapper.writeValueAsString(object);
+    }
+
+    @SneakyThrows(JsonProcessingException.class)
+    public <T> T fromJson(String string, Class<T> type) {
+        return Objects.nonNull(string) ? objectMapper.readValue(string, type) : null;
+    }
+
 }

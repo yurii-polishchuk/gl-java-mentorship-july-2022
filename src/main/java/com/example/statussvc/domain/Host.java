@@ -1,8 +1,10 @@
 package com.example.statussvc.domain;
 
+import com.example.statussvc.domain.type.Status;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -19,17 +21,27 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Host implements Domain {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+
+    @NotBlank
     private String title;
+
+    @NotBlank
     private String description;
-    @NotNull
+
+    @NotBlank
     private String url;
+
+    @NotNull
     private Duration connectionTime;
+
     private LocalDateTime lastCheck;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
+
 }

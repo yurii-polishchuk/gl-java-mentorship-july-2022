@@ -8,26 +8,29 @@ spring:
     bannerMode: off
   # Data source
   dataSource:
-    url: test
-    username: test
-    password: test
+    url: jdbc:mysql://localhost:3306/${spring.application.name}db
+    username: root
+    password: password
+    driverClassName: com.mysql.cj.jdbc.Driver
     hikari:
       connectionTimeout: 10000
       maximumPoolSize: 10
       minimumIdle: 10
+
   jpa:
     showSql: false
     properties:
       hibernate:
         jdbc:
           time_zone: UTC
+        dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddlAuto: validate
+      ddlAuto: none
+    openInView: false
   # Flyway
   flyway:
     enabled: false
     baselineOnMigrate: false
-    locations: classpath:db/migration/mysql
 
 # Embedded Server
 server:
