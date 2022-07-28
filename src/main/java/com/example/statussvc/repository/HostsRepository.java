@@ -1,5 +1,6 @@
 package com.example.statussvc.repository;
 
+import com.example.statussvc.domain.Host;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
