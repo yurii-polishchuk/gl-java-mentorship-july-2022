@@ -4,6 +4,7 @@ import brave.Tracer;
 import com.example.statussvc.service.HostsService;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
+import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,7 +64,7 @@ public class HostsController {
     }
 
     @GetMapping("/host/{id}")
-    public ResponseEntity<RetrieveHostResponse> retrieve(@PathVariable Long id) throws Exception {
+    public ResponseEntity<RetrieveHostResponse> retrieve(@PathVariable Long id) {
         return hostsService.retrieve(id);
     }
 

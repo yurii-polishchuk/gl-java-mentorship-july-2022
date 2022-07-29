@@ -5,13 +5,14 @@ import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
+import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Optional;
 
@@ -46,13 +47,11 @@ public class HostsService {
         return null;
     }
 
-    public ResponseEntity<RetrieveHostResponse> retrieve(@PathVariable Long id) throws HttpClientErrorException,
-            JsonProcessingException {
+    public ResponseEntity<RetrieveHostResponse> retrieve(@PathVariable Long id) {
         Optional<Host> host = hostsRepository.findById(id);
-        RetrieveHostResponse retrieveHostResponse = new RetrieveHostResponse();
-        return new ResponseEntity(retrieveHostResponse.getContentAsString(host.get()),
-                new HttpHeaders(), HttpStatus.OK);
+        return null;
     }
+
     /**
      * Retrieves all Hosts
      *
