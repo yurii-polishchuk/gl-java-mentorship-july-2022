@@ -4,8 +4,11 @@ import com.example.statussvc.domain.Host;
 import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.request.CreateHostRequest;
+import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,9 +45,14 @@ public class HostsService {
     public Object retrieve() {
         return null;
     }
-
-    public Object retrieveAll() {
-        return null;
+    /**
+     * Retrieves all Hosts
+     *
+     * @param paging - {@link Pageable} paging object
+     * @return {@link Page} page of filtered and sorted {@link RetrieveAllHostsResponse} objects
+     */
+    public Page<RetrieveAllHostsResponse> retrieveAll(Pageable paging) {
+        return hostsRepository.findAll(paging).map(hostMapper::toRetrieveAllHostsResponse);
     }
 
     public Object remove() {

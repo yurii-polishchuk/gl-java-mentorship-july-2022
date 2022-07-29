@@ -31,6 +31,7 @@ import static com.example.statussvc.controller.HostControllerFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @MockBean(
         classes = {
                 HostsService.class,
-                Tracer.class
+                Tracer.class,
         },
         answer = Answers.RETURNS_SMART_NULLS
 )
@@ -50,7 +51,6 @@ class HostControllerTest {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
-
     private final Tracer tracer;
     private final HostsService hostsService;
 
@@ -121,6 +121,27 @@ class HostControllerTest {
         assertThat(actualResponse.message()).isEqualTo(CREATE_HOST_RESPONSE_BAD_REQUEST_MESSAGE);
     }
 
+    @Test
+    @DisplayName("""
+            GIVEN default page number and page size
+            WHEN performing GET request
+            THEN return response with code 200 and list of hosts
+            """)
+    void retrieveAllHostsValid() throws Exception {
+        // GIVEN
+        given(hostsService.retrieveAll(PAGEABLE)).willReturn(GET_ALL_HOSTS_RESPONSE);
+        // WHEN
+        MockHttpServletResponse actualResponse = mockMvc
+                .perform(get(HOSTS_URL_VALID)
+                        .accept(MediaType.APPLICATION_JSON))
+                // THEN
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+        // AND THEN
+        assertThat(actualResponse.getContentAsString()).isEqualTo(toJson(GET_ALL_HOSTS_RESPONSE));
+    }
+
     @SneakyThrows(JsonProcessingException.class)
     private String toJson(Object object) {
         return objectMapper.writeValueAsString(object);
@@ -130,5 +151,4 @@ class HostControllerTest {
     public <T> T fromJson(String string, Class<T> type) {
         return Objects.nonNull(string) ? objectMapper.readValue(string, type) : null;
     }
-
 }
