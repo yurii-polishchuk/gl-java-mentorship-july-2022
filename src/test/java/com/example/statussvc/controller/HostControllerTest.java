@@ -4,8 +4,6 @@ import brave.Span;
 import brave.Tracer;
 import brave.propagation.TraceContext;
 import com.example.statussvc.service.HostsService;
-import lombok.RequiredArgsConstructor;
-import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.response.RestContractExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,13 +24,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Objects;
 
@@ -41,14 +32,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = HostsController.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@MockBean(Tracer.class)
 @MockBean(
         classes = {
                 HostsService.class,
@@ -130,54 +119,6 @@ class HostControllerTest {
 
         // AND THEN
         assertThat(actualResponse.message()).isEqualTo(CREATE_HOST_RESPONSE_BAD_REQUEST_MESSAGE);
-    }
-
-    @Test
-    @DisplayName("""
-            GIVEN endpoint with existing id
-            WHEN performing GET request
-            THEN return host data with code 200
-            """)
-
-    void HostByExistedId() throws Exception {
-        // GIVEN
-        CreateHostRequest createHostRequest = CreateHostRequest.builder()
-                .title("Google")
-                .description("Google Description")
-                .url("https://google.com/")
-                .build();
-        given(hostsService.create(createHostRequest)).willReturn(100L);
-        // WHEN
-        MockHttpServletResponse actualResponse = mockMvc.perform(MockMvcRequestBuilders
-                        .get("/hosts/{id}", 100L)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                // AND THEN
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(100L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Google"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Google Description"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.url").value("https://google.com/"))
-                .andReturn()
-                .getResponse();
-    }
-
-    @Test
-    @DisplayName("""
-            GIVEN endpoint with not existing id
-            WHEN performing GET request
-            THEN return 404 Not Found
-            """)
-    void HostByNotExistingId() throws Exception {
-        // GIVEN
-
-        //WHEN
-        mockMvc.perform(MockMvcRequestBuilders
-                        .get("/hosts/{id}", 666L)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                // AND THEN
-                .andExpect(status().isNotFound());
     }
 
     @SneakyThrows(JsonProcessingException.class)
