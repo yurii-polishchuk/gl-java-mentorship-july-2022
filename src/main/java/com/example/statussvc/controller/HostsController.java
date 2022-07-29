@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import java.net.URI;
 
 import static com.example.statussvc.Constants.API_V1;
+import static com.example.statussvc.Constants.URL_SEPARATOR;
 
 /**
  * Entry point for Hosts endpoint APIs.
@@ -24,14 +25,27 @@ import static com.example.statussvc.Constants.API_V1;
 @RequestMapping(API_V1)
 public class HostsController {
 
-    private final HostsService hostsService;
     private static final String HOSTS_ENDPOINT = "/hosts";
     private static final String HOST_ENDPOINT = HOSTS_ENDPOINT + "/{id}";
 
     private final Tracer tracer;
+    private final HostsService hostsService;
 
-    public Object create() {
-        return null;
+    /**
+     * POST to create Host entry.
+     *
+     * @param createHostRequest  {@link CreateHostRequest} with body
+     * @param httpServletRequest {@link HttpServletRequest} with full request data
+     * @return {@link ResponseEntity} with trace and location headers
+     */
+    @PostMapping(path = HOSTS_ENDPOINT)
+    public ResponseEntity<URI> create(
+            @Valid @RequestBody CreateHostRequest createHostRequest,
+            HttpServletRequest httpServletRequest
+    ) {
+        return ResponseEntity.created(
+                URI.create(httpServletRequest.getRequestURI() + URL_SEPARATOR + hostsService.create(createHostRequest))
+        ).build();
     }
 
     public Object replace() {

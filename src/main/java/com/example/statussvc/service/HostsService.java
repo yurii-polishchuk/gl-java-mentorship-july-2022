@@ -3,9 +3,9 @@ package com.example.statussvc.service;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.domain.Host;
 import com.example.statussvc.mapper.HostMapper;
-import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
