@@ -4,6 +4,7 @@ import brave.Span;
 import brave.Tracer;
 import brave.propagation.TraceContext;
 import com.example.statussvc.service.HostsService;
+import lombok.RequiredArgsConstructor;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.response.RestContractExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,6 +29,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
 import java.util.Objects;
 
 import static com.example.statussvc.controller.HostControllerFixture.*;
@@ -42,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = HostsController.class)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@MockBean(Tracer.class)
 @MockBean(
         classes = {
                 HostsService.class,
@@ -134,12 +141,12 @@ class HostControllerTest {
 
     void HostByExistedId() throws Exception {
         // GIVEN
-        CreateHostRequest hostCreateRequest = CreateHostRequest.builder()
+        CreateHostRequest createHostRequest = CreateHostRequest.builder()
                 .title("Google")
                 .description("Google Description")
                 .url("https://google.com/")
                 .build();
-        given(hostsService.create(hostCreateRequest)).willReturn(100L);
+        given(hostsService.create(createHostRequest)).willReturn(100L);
         // WHEN
         MockHttpServletResponse actualResponse = mockMvc.perform(MockMvcRequestBuilders
                         .get("/hosts/{id}", 100L)

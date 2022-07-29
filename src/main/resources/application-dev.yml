@@ -2,11 +2,16 @@
 spring:
   main:
     bannerMode: console
+  # Data source
+  dataSource:
+    url: jdbc:mysql://localhost:3306/${spring.application.name}db
+    username: root
+    password: password
   jpa:
     showSql: true
   flyway:
-    baselineOnMigrate: true
-    enabled: true
+    baselineOnMigrate: false
+    enabled: false
 
 # Logging
 logging:

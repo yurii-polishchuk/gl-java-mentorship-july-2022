@@ -52,7 +52,7 @@ dependencies {
 
     // Data
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-    implementation "org.flywaydb:flyway-mysql"
+    implementation "org.flywaydb:flyway-core"
     implementation "mysql:mysql-connector-java"
 
     // Commons, Utilities
@@ -76,11 +76,7 @@ java {
 }
 
 jar {
-    bootJar {
-        archiveBaseName.set rootProject.name
-        archiveVersion.set ""
-        mainClass.set "com.example.statussvc.Application"
-    }
+    enabled = false
 }
 
 test {
