@@ -12,5 +12,4 @@ public record RestContractExceptionResponse(
         String message,
         String tracingId
 ) implements Response {
-
 }

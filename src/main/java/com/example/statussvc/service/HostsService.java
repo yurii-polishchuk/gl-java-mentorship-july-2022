@@ -1,5 +1,7 @@
 package com.example.statussvc.service;
 
+import com.example.statussvc.domain.type.Host;
+import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.domain.Host;
 import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
@@ -23,6 +25,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequiredArgsConstructor
 public class HostsService {
 
+    @Autowired
+    private final HostsRepository hostsRepository;
+
+    public Object create() {
+        return null;
     private final HostsRepository hostsRepository;
     private final HostMapper hostMapper;
 
