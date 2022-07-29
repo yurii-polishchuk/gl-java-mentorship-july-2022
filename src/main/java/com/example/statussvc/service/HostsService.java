@@ -1,15 +1,20 @@
 package com.example.statussvc.service;
 
+import com.example.statussvc.domain.type.Host;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.domain.Host;
 import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 /**
@@ -20,6 +25,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequiredArgsConstructor
 public class HostsService {
 
+    @Autowired
+    private final HostsRepository hostsRepository;
+
+    public Object create() {
+        return null;
     private final HostsRepository hostsRepository;
     private final HostMapper hostMapper;
 
