@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Builder
 @Jacksonized
-public record RetrieveAllHostsResponse(
+public record RetrieveHostResponse(
         Long id,
         String title,
         String description,

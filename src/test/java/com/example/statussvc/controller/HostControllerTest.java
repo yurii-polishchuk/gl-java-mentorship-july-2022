@@ -5,10 +5,14 @@ import brave.Tracer;
 import brave.propagation.TraceContext;
 import com.example.statussvc.service.HostsService;
 import com.example.statussvc.wire.response.RestContractExceptionResponse;
+import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
+import com.example.statussvc.wire.response.RetrieveHostResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.hibernate.exception.JDBCConnectionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,11 +23,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Objects;
 
@@ -129,17 +135,160 @@ class HostControllerTest {
             """)
     void retrieveAllHostsValid() throws Exception {
         // GIVEN
-        given(hostsService.retrieveAll(PAGEABLE)).willReturn(GET_ALL_HOSTS_RESPONSE);
+        given(hostsService.retrieveAll(PAGE_REQUEST)).willReturn(GET_ALL_HOSTS_RESPONSE_PAGEABLE);
+
         // WHEN
-        MockHttpServletResponse actualResponse = mockMvc
-                .perform(get(HOSTS_URL_VALID)
-                        .accept(MediaType.APPLICATION_JSON))
-                // THEN
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse();
+        PageResponse<RetrieveAllHostsResponse> actualResponse = fromJson(mockMvc
+                        .perform(get(HOSTS_URL_VALID)
+                                .accept(MediaType.APPLICATION_JSON))
+                        // THEN
+                        .andExpect(status().isOk())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                new TypeReference<>() {
+                }
+        );
+
         // AND THEN
-        assertThat(actualResponse.getContentAsString()).isEqualTo(toJson(GET_ALL_HOSTS_RESPONSE));
+        assertThat(actualResponse.getTotalElements()).isEqualTo(2L);
+        assertThat(actualResponse.getTotalPages()).isEqualTo(1);
+        assertThat(actualResponse.getContent()).isEqualTo(RETRIEVE_ALL_HOSTS_RESPONSE);
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN default page number and page size
+            WHEN performing GET request
+            THEN return response with code 200 and empty list of hosts
+            """)
+    void retrieveAllHostsEmptyValid() throws Exception {
+        // GIVEN
+        given(hostsService.retrieveAll(PAGE_REQUEST)).willReturn(GET_ALL_HOSTS_EMPTY_RESPONSE_PAGEABLE);
+
+        // WHEN
+        PageResponse<RetrieveAllHostsResponse> actualResponse = fromJson(mockMvc
+                        .perform(get(HOSTS_URL_VALID)
+                                .accept(MediaType.APPLICATION_JSON))
+                        // THEN
+                        .andExpect(status().isOk())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                new TypeReference<>() {
+                }
+        );
+
+        // AND THEN
+        assertThat(actualResponse.getTotalElements()).isZero();
+        assertThat(actualResponse.getTotalPages()).isZero();
+        assertThat(actualResponse.getContent()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN default page number and page size
+            WHEN performing GET request and Storage returns exception
+            THEN return response with code 500 and error message
+            """)
+    void retrieveAllHostsInternalServiceError() throws Exception {
+        // GIVEN
+        given(hostsService.retrieveAll(PAGE_REQUEST))
+                .willThrow(new JDBCConnectionException(STORAGE_EXCEPTION_MESSAGE, null));
+
+        // WHEN
+        RestContractExceptionResponse actualResponse = fromJson(mockMvc
+                        .perform(get(HOSTS_URL_VALID)
+                                .accept(MediaType.APPLICATION_JSON))
+                        // THEN
+                        .andExpect(status().isInternalServerError())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                RestContractExceptionResponse.class);
+
+        // AND THEN
+        assertThat(actualResponse.message()).isEqualTo(STORAGE_EXCEPTION_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN valid host id
+            WHEN performing GET request
+            THEN return response with code 200 and host entry
+            """)
+    void retrieveOneHostByIdValid() throws Exception {
+        // GIVEN
+        given(hostsService.retrieve(HOST_ID_VALID)).willReturn(RETRIEVE_HOST_RESPONSE_VALID);
+
+        // WHEN
+        RetrieveHostResponse actualResponse = fromJson(mockMvc
+                        .perform(get(HOST_URL_VALID, HOST_ID_VALID)
+                                .accept(MediaType.APPLICATION_JSON))
+
+                        // THEN
+                        .andExpect(status().isOk())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                RetrieveHostResponse.class);
+
+        // AND THEN
+        assertThat(actualResponse).isEqualTo(RETRIEVE_HOST_RESPONSE_VALID);
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN invalid host id
+            WHEN performing GET request
+            THEN return response with code 404 and no host entry
+            """)
+    void retrieveOneHostByIdInValid() throws Exception {
+        // GIVEN
+        given(hostsService.retrieve(HOST_ID_INVALID))
+                .willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        // WHEN
+        RestContractExceptionResponse actualResponse = fromJson(mockMvc
+                        .perform(get(HOST_URL_VALID, HOST_ID_INVALID)
+                                .accept(MediaType.APPLICATION_JSON))
+
+                        // THEN
+                        .andExpect(status().isNotFound())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                RestContractExceptionResponse.class);
+
+        // AND THEN
+        assertThat(actualResponse.message()).isEqualTo(NOT_FOUND_EXCEPTION_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN invalid host id
+            WHEN performing GET request
+            THEN return response with code 404 and no host entry
+            """)
+    void retrieveOneHostByIdInternalServiceError() throws Exception {
+        // GIVEN
+        given(hostsService.retrieve(HOST_ID_VALID))
+                .willThrow(new JDBCConnectionException(STORAGE_EXCEPTION_MESSAGE, null));
+
+        // WHEN
+        RestContractExceptionResponse actualResponse = fromJson(mockMvc
+                        .perform(get(HOST_URL_VALID, HOST_ID_VALID)
+                                .accept(MediaType.APPLICATION_JSON))
+
+                        // THEN
+                        .andExpect(status().isInternalServerError())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                RestContractExceptionResponse.class);
+
+        // AND THEN
+        assertThat(actualResponse.message()).isEqualTo(STORAGE_EXCEPTION_MESSAGE);
     }
 
     @SneakyThrows(JsonProcessingException.class)
@@ -151,4 +300,10 @@ class HostControllerTest {
     public <T> T fromJson(String string, Class<T> type) {
         return Objects.nonNull(string) ? objectMapper.readValue(string, type) : null;
     }
+
+    @SneakyThrows(JsonProcessingException.class)
+    public <T> T fromJson(String string, TypeReference<T> type) {
+        return Objects.nonNull(string) ? objectMapper.readValue(string, type) : null;
+    }
+
 }
