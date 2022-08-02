@@ -1,15 +1,17 @@
 package com.example.statussvc.service;
 
-import com.example.statussvc.domain.Host;
 import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
+import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * CRUD operations for Hosts Management.
@@ -29,9 +31,7 @@ public class HostsService {
      * @return {@link Long} unique id of the Host in storage
      */
     public Long create(CreateHostRequest createHostRequest) {
-        Host host = hostMapper.toHost(createHostRequest);
-        Host save = hostsRepository.save(host);
-        return save.getId();
+        return hostsRepository.save(hostMapper.toHost(createHostRequest)).getId();
     }
 
     public Object replace() {
@@ -42,9 +42,18 @@ public class HostsService {
         return null;
     }
 
-    public Object retrieve() {
-        return null;
+    /**
+     * Retrieves one Host by unique identifier
+     *
+     * @param id - {@link Long} unique entry identifier
+     * @return {@link RetrieveHostResponse} mapped object
+     */
+    public RetrieveHostResponse retrieve(Long id) {
+        return hostsRepository.findById(id)
+                .map(hostMapper::toRetrieveHostResponse)
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
     }
+
     /**
      * Retrieves all Hosts
      *

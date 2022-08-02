@@ -3,6 +3,7 @@ package com.example.statussvc.mapper;
 import com.example.statussvc.domain.Host;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
+import com.example.statussvc.wire.response.RetrieveHostResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -22,4 +23,7 @@ public abstract class HostMapper {
     public abstract Host toHost(CreateHostRequest createHostRequest);
 
     public abstract RetrieveAllHostsResponse toRetrieveAllHostsResponse(Host host);
+
+    public abstract RetrieveHostResponse toRetrieveHostResponse(Host host);
+
 }
