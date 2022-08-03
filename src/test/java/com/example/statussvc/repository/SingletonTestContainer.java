@@ -20,9 +20,9 @@ public class SingletonTestContainer extends MySQLContainer<SingletonTestContaine
         @Override
         public void start() {
             super.start();
-            System.setProperty("statussvcdb", container.getJdbcUrl());
-            System.setProperty("root", container.getUsername());
-            System.setProperty("password", container.getPassword());
+            System.setProperty("DB_URL", container.getJdbcUrl());
+            System.setProperty("DB_USERNAME", container.getUsername());
+            System.setProperty("DB_PASSWORD", container.getPassword());
         }
 
         @Override
