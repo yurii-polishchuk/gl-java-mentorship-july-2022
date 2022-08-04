@@ -50,6 +50,10 @@ management:
 
 # Application
 application:
+  scheduler:
+    host:
+      availability:
+        cron: 0 */5 * * * *
   service:
     version: 1.0.0
 
@@ -58,7 +62,3 @@ logging:
   file:
     name: ${spring.application.name}.log
   config: classpath:log4j2.yml
-
-#Scheduling
-scheduled:
-  cron: "0 */5 * * * *"

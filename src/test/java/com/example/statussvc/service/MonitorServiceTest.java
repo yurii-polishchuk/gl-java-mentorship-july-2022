@@ -1,9 +1,12 @@
 package com.example.statussvc.service;
 
+import com.example.statussvc.configuration.ApplicationProperties;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -14,9 +17,10 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
-@SpringJUnitConfig(MonitorService.class)
+@SpringJUnitConfig(classes = MonitorService.class, initializers = ConfigDataApplicationContextInitializer.class)
 @ActiveProfiles("test")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@EnableConfigurationProperties(ApplicationProperties.class)
 public class MonitorServiceTest {
 
     @SpyBean
@@ -28,9 +32,9 @@ public class MonitorServiceTest {
             WHEN await at most 10 minutes
             THEN verify trigger task at least twice
             """)
-    public void properlyTrigger() {
+    public void properlyTriggerAvailableHostCheck() {
         await()
-                .atMost(Duration.ofMinutes(10L))
-                .untilAsserted(() -> verify(monitorService, atLeast(2)).checkHostsAvailability());
+                .atMost(Duration.ofMinutes(100L))
+                .untilAsserted(() -> verify(monitorService, atLeast(20)).checkHostsAvailability());
     }
 }
