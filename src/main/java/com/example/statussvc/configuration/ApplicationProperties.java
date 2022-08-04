@@ -10,9 +10,18 @@ import javax.validation.constraints.NotNull;
 @Validated
 @ConstructorBinding
 @ConfigurationProperties(prefix = "application")
-public record ApplicationProperties(@NotNull Service service) {
+public record ApplicationProperties(@NotNull Service service, @NotNull Scheduler scheduler) {
 
     public record Service(@NotEmpty String version) {
+    }
+
+    @ConstructorBinding
+    public record Scheduler(@NotNull Host host) {
+        @ConstructorBinding
+        public record Host(@NotNull Availability availability) {
+            public record Availability(@NotEmpty String cron) {
+            }
+        }
     }
 
 }
