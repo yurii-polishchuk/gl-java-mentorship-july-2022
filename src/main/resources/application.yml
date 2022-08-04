@@ -62,3 +62,7 @@ logging:
   file:
     name: ${spring.application.name}.log
   config: classpath:log4j2.yml
+
+#Scheduling
+scheduled:
+  cron: "0 */5 * * * *"
