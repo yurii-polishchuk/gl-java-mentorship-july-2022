@@ -3,7 +3,6 @@ package com.example.statussvc.mapper;
 import com.example.statussvc.domain.Host;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.request.ReplaceHostRequest;
-import com.example.statussvc.wire.response.ReplaceHostResponse;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
 import org.mapstruct.Mapper;
@@ -28,6 +27,9 @@ public abstract class HostMapper {
 
     public abstract RetrieveHostResponse toRetrieveHostResponse(Host host);
 
-    public abstract ReplaceHostResponse toReplaceHostResponse(Host host);
+    @Mapping(target = "connectionTime", expression = "java(java.time.Duration.ZERO)")
+    @Mapping(target = "lastCheck", expression = "java(null)")
+    @Mapping(target = "status", constant = "UNKNOWN")
+    public abstract Host toHost(Long id, ReplaceHostRequest replaceHostRequest);
 
 }

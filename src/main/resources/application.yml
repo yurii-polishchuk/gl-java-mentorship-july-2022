@@ -16,7 +16,6 @@ spring:
       connectionTimeout: 10000
       maximumPoolSize: 10
       minimumIdle: 10
-
   jpa:
     showSql: false
     properties:
