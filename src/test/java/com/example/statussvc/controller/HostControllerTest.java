@@ -37,8 +37,7 @@ import static com.example.statussvc.controller.HostControllerFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -289,6 +288,82 @@ class HostControllerTest {
 
         // AND THEN
         assertThat(actualResponse.message()).isEqualTo(STORAGE_EXCEPTION_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN valid host id and valid host object
+            WHEN performing PUT request
+            THEN return response with code 200 and no host entry
+            """)
+    void putHostByValidId() throws Exception {
+        // GIVEN
+        given(hostsService.replace(HOST_ID_VALID, REPLACE_HOST_REQUEST)).willReturn(REPLACE_HOST_RESPONSE_VALID);
+
+        // WHEN
+        MockHttpServletResponse actualResponse = mockMvc
+                .perform(put(HOST_URL_VALID, HOST_ID_VALID)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(REPLACE_HOST_REQUEST))
+                )
+                // THEN
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+
+        // AND THEN
+        assertThat(actualResponse.getContentAsString()).isEqualTo(toJson(REPLACE_HOST_RESPONSE_VALID));
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN invalid host id and valid host object
+            WHEN performing PUT request
+            THEN return response with code 404
+            """)
+    void putHostByInvalidId() throws Exception {
+        // GIVEN
+        given(hostsService.replace(HOST_ID_INVALID, REPLACE_HOST_REQUEST))
+                .willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        // WHEN
+        mockMvc
+                .perform(put(HOST_URL_VALID, HOST_ID_INVALID)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(REPLACE_HOST_REQUEST))
+                )
+                // THEN
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN valid host id and invalid host object
+            WHEN performing PUT request
+            THEN return response with code 400
+            """)
+    void putHostByValidIdAndInvalidReplaceHostRequest() throws Exception {
+        // GIVEN
+        given(hostsService.replace(HOST_ID_VALID, REPLACE_HOST_REQUEST_INVALID))
+                .willReturn(REPLACE_HOST_RESPONSE_VALID);
+
+        // WHEN
+        RestContractExceptionResponse actualResponse =
+                fromJson(mockMvc
+                        .perform(put(HOST_URL_VALID, HOST_ID_VALID)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(REPLACE_HOST_REQUEST_INVALID))
+                        )
+                        .andExpect(status().isBadRequest())
+                                .andReturn()
+                                .getResponse()
+                        .getContentAsString(),
+                RestContractExceptionResponse.class);
+        //AND THEN
+        assertThat(actualResponse.message()).isEqualTo(BLANK_DESCRIPTION_MESSAGE);
     }
 
     @SneakyThrows(JsonProcessingException.class)

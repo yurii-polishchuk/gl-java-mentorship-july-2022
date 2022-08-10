@@ -3,6 +3,8 @@ package com.example.statussvc.controller;
 import brave.Tracer;
 import com.example.statussvc.service.HostsService;
 import com.example.statussvc.wire.request.CreateHostRequest;
+import com.example.statussvc.wire.request.ReplaceHostRequest;
+import com.example.statussvc.wire.response.ReplaceHostResponse;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
@@ -56,8 +58,13 @@ public class HostsController {
         ).build();
     }
 
-    public Object replace() {
-        return null;
+    @PutMapping(path = HOST_ENDPOINT)
+    public ResponseEntity<ReplaceHostResponse> replace(
+            @PathVariable Long id,
+            @Valid @RequestBody ReplaceHostRequest replaceHostRequest
+    ) {
+        return ResponseEntity.ok(
+                hostsService.replace(id, replaceHostRequest));
     }
 
     public Object modify() {
