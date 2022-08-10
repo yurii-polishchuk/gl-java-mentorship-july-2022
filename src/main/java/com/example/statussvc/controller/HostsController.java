@@ -5,6 +5,7 @@ import com.example.statussvc.service.HostsService;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.request.ReplaceHostRequest;
 import com.example.statussvc.wire.response.ReplaceHostResponse;
+import com.example.statussvc.wire.response.RestContractExceptionResponse;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
@@ -98,8 +99,17 @@ public class HostsController {
         return ResponseEntity.ok(hostsService.retrieveAll(pageable));
     }
 
-    public Object remove() {
-        return null;
+    /**
+     * DELETE to delete One Host entry.
+     *
+     * @param id {@link Long} unique identifier
+     * @return {@link ResponseEntity} without body
+     */
+    @DeleteMapping(path = HOST_ENDPOINT)
+    public ResponseEntity delete(@PathVariable @Positive Long id) {
+        hostsService.remove(id);
+        return ResponseEntity.ok().build();
+
     }
 
     public Object removeAll() {

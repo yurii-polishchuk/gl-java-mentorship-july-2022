@@ -2,11 +2,10 @@ package com.example.statussvc.service;
 
 import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
+import com.example.statussvc.wire.Response;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.request.ReplaceHostRequest;
-import com.example.statussvc.wire.response.ReplaceHostResponse;
-import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
-import com.example.statussvc.wire.response.RetrieveHostResponse;
+import com.example.statussvc.wire.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -80,8 +79,17 @@ public class HostsService {
         return hostsRepository.findAll(paging).map(hostMapper::toRetrieveAllHostsResponse);
     }
 
-    public Object remove() {
-        return null;
+    /**
+     * Remove one Host by unique identifier
+     *
+     * @param id - {@link Long} unique entry identifier
+     */
+    public void remove(Long id) {
+        try {
+            hostsRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        }
     }
 
     public Object removeAll() {
