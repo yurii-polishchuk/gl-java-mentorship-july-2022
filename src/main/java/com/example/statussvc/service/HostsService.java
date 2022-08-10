@@ -3,6 +3,8 @@ package com.example.statussvc.service;
 import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.request.CreateHostRequest;
+import com.example.statussvc.wire.request.ReplaceHostRequest;
+import com.example.statussvc.wire.response.ReplaceHostResponse;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +36,22 @@ public class HostsService {
         return hostsRepository.save(hostMapper.toHost(createHostRequest)).getId();
     }
 
-    public Object replace() {
-        return null;
+    /**
+     * Updates or creates new Host.
+     *
+     * @param id  -                {@link Long} unique id of the Host in storage
+     * @param replaceHostRequest - {@link ReplaceHostRequest} replace request object
+     * @return {@link ReplaceHostResponse} replace response object
+     */
+    public ReplaceHostResponse replace(Long id, ReplaceHostRequest replaceHostRequest) {
+        return hostsRepository.findById(id)
+                .map((updatedHost) -> {
+                    updatedHost.setTitle(replaceHostRequest.title());
+                    updatedHost.setDescription(replaceHostRequest.description());
+                    updatedHost.setUrl(replaceHostRequest.url());
+                    return hostMapper.toReplaceHostResponse(hostsRepository.save(updatedHost));
+                })
+                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
     }
 
     public Object modify() {
