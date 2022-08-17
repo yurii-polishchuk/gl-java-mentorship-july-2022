@@ -74,8 +74,17 @@ public class HostsService {
         return hostsRepository.findAll(paging).map(hostMapper::toRetrieveAllHostsResponse);
     }
 
-    public Object remove() {
-        return null;
+    /**
+     * Remove one Host by unique identifier
+     *
+     * @param id - {@link Long} unique entry identifier
+     */
+    public void remove(Long id) {
+        try {
+            hostsRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        }
     }
 
     public Object removeAll() {

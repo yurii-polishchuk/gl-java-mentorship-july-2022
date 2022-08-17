@@ -104,8 +104,17 @@ public class HostsController {
         return ResponseEntity.ok(hostsService.retrieveAll(pageable));
     }
 
-    public Object remove() {
-        return null;
+    /**
+     * DELETE to delete One Host entry.
+     *
+     * @param id {@link Long} unique identifier
+     * @return {@link ResponseEntity} without body
+     */
+    @DeleteMapping(path = HOST_ENDPOINT)
+    public ResponseEntity delete(@PathVariable @Positive Long id) {
+        hostsService.remove(id);
+        return ResponseEntity.ok().build();
+
     }
 
     public Object removeAll() {

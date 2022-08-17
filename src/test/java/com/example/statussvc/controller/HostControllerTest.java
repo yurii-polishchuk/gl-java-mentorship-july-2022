@@ -372,6 +372,28 @@ class HostControllerTest {
         assertThat(actualResponse.message()).isEqualTo(REPLACE_HOST_RESPONSE_BAD_REQUEST_MESSAGE);
     }
 
+    @Test
+    @DisplayName("""
+            GIVEN valid host id
+            WHEN performing DELETE request
+            THEN return response with code 200
+            """)
+    void deleteHostByValidId() throws Exception {
+        // GIVEN
+        // WHEN
+        MockHttpServletResponse actualResponse = mockMvc
+                .perform(delete(HOST_URL_VALID, HOST_ID_VALID)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                // THEN
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+        // AND THEN
+        assertThat(actualResponse.getContentAsString()).isBlank();
+    }
+
     @SneakyThrows(JsonProcessingException.class)
     private String toJson(Object object) {
         return objectMapper.writeValueAsString(object);
