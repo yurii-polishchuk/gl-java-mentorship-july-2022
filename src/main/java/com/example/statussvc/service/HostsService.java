@@ -3,6 +3,7 @@ package com.example.statussvc.service;
 import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.request.CreateHostRequest;
+import com.example.statussvc.wire.request.ModifyHostRequest;
 import com.example.statussvc.wire.request.ReplaceHostRequest;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
@@ -48,8 +49,18 @@ public class HostsService {
         hostsRepository.save(hostMapper.toHost(id, replaceHostRequest));
     }
 
-    public Object modify() {
-        return null;
+    /**
+     * Modifies e.g. Partially Updates Host entry.
+     *
+     * @param id                - {@link Long} unique id of the Host in storage
+     * @param modifyHostRequest - {@link ModifyHostRequest} modify request object
+     */
+    public void modify(Long id, ModifyHostRequest modifyHostRequest) {
+        hostsRepository.save(hostMapper.toHost(
+                hostsRepository.findById(id)
+                        .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)),
+                modifyHostRequest)
+        );
     }
 
     /**

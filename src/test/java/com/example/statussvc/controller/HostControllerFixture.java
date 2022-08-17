@@ -1,6 +1,7 @@
 package com.example.statussvc.controller;
 
 import com.example.statussvc.wire.request.CreateHostRequest;
+import com.example.statussvc.wire.request.ModifyHostRequest;
 import com.example.statussvc.wire.request.ReplaceHostRequest;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
@@ -36,6 +37,14 @@ public class HostControllerFixture {
     static final ReplaceHostRequest REPLACE_HOST_REQUEST_INVALID = ReplaceHostRequest.builder()
             .build();
 
+    static final ModifyHostRequest MODIFY_HOST_REQUEST_INVALID = ModifyHostRequest.builder()
+            .url("not valid url")
+            .build();
+
+    static final ModifyHostRequest MODIFY_HOST_REQUEST = ModifyHostRequest.builder()
+            .description("Google Description Modified")
+            .build();
+
     static final RetrieveAllHostsResponse FIRST_RETRIEVE_HOST_RESPONSE = RetrieveAllHostsResponse.builder()
             .title("Google")
             .description("Google Description")
@@ -67,7 +76,7 @@ public class HostControllerFixture {
             .build();
 
     static final List<RetrieveAllHostsResponse> RETRIEVE_ALL_HOSTS_RESPONSE = List.of(FIRST_RETRIEVE_HOST_RESPONSE, SECOND_RETRIEVE_HOST_RESPONSE);
-    
+
     static final PageResponse<RetrieveAllHostsResponse> GET_ALL_HOSTS_RESPONSE_PAGEABLE = new PageResponse<>(
             RETRIEVE_ALL_HOSTS_RESPONSE,
             PAGE_REQUEST
@@ -78,6 +87,7 @@ public class HostControllerFixture {
     static final String CREATE_HOST_REQUEST_INVALID = "{\"test\":\"test\"}";
     static final String CREATE_HOST_RESPONSE_BAD_REQUEST_MESSAGE = "description: must not be blank, title: must not be blank, url: must not be blank";
     static final String REPLACE_HOST_RESPONSE_BAD_REQUEST_MESSAGE = "description: must not be blank, title: must not be blank, url: must not be blank";
+    static final String MODIFY_HOST_RESPONSE_BAD_REQUEST_MESSAGE = "url: must be a valid URL";
     static final String DELETE_HOST_RESPONSE_BAD_REQUEST_MESSAGE = "id: provided wrong type, expected type is Long";
     private static final String API_V1 = "/api/v1";
     static final String HOSTS_URL_VALID = API_V1 + "/hosts";

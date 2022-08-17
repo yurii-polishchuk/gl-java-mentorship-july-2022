@@ -3,6 +3,7 @@ package com.example.statussvc.controller;
 import brave.Tracer;
 import com.example.statussvc.service.HostsService;
 import com.example.statussvc.wire.request.CreateHostRequest;
+import com.example.statussvc.wire.request.ModifyHostRequest;
 import com.example.statussvc.wire.request.ReplaceHostRequest;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
@@ -72,8 +73,20 @@ public class HostsController {
         return ResponseEntity.noContent().build();
     }
 
-    public Object modify() {
-        return null;
+    /**
+     * PATCH to modify One Host entry.
+     *
+     * @param id                {@link Long} unique identifier
+     * @param modifyHostRequest {@link ModifyHostRequest} with body
+     * @return {@link ResponseEntity} of {@link Void}
+     */
+    @PatchMapping(path = HOST_ENDPOINT)
+    public ResponseEntity<Void> modify(
+            @PathVariable Long id,
+            @Valid @RequestBody ModifyHostRequest modifyHostRequest
+    ) {
+        hostsService.modify(id, modifyHostRequest);
+        return ResponseEntity.noContent().build();
     }
 
     /**

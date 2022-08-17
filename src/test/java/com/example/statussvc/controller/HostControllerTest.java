@@ -507,6 +507,88 @@ class HostControllerTest {
         assertThat(actualResponse.message()).isEqualTo(NOT_FOUND_EXCEPTION_MESSAGE);
     }
 
+    @Test
+    @DisplayName("""
+            GIVEN valid host id and valid host object
+            WHEN performing PATCH request
+            THEN return response with code 204
+            """)
+    void modifyHostByValidId() throws Exception {
+        // GIVEN
+        doNothing().when(hostsService).modify(HOST_ID_VALID, MODIFY_HOST_REQUEST);
+
+        // WHEN
+        MockHttpServletResponse actualResponse = mockMvc
+                .perform(patch(HOST_URL_VALID, HOST_ID_VALID)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(MODIFY_HOST_REQUEST))
+                )
+                // THEN
+                .andExpect(status().isNoContent())
+                .andReturn()
+                .getResponse();
+
+        // AND THEN
+        assertThat(actualResponse.getContentAsString()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN invalid host id and valid host object
+            WHEN performing PATCH request
+            THEN return response with code 404 and not found entry
+            """)
+    void modifyHostByInvalidId() throws Exception {
+        // GIVEN
+        doThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND))
+                .when(hostsService).modify(HOST_ID_INVALID, MODIFY_HOST_REQUEST);
+
+        // WHEN
+        RestContractExceptionResponse actualResponse = fromJson(mockMvc
+                        .perform(patch(HOST_URL_VALID, HOST_ID_INVALID)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(MODIFY_HOST_REQUEST))
+                        )
+                        // THEN
+                        .andExpect(status().isNotFound())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                RestContractExceptionResponse.class);
+
+        // AND THEN
+        assertThat(actualResponse.message()).isEqualTo(NOT_FOUND_EXCEPTION_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN valid host id and invalid host object
+            WHEN performing PATCH request
+            THEN return response with code 400 and message "Bad Request"
+            """)
+    void modifyHostByValidIdAndInvalidModifyHostRequest() throws Exception {
+        // GIVEN
+        doNothing().when(hostsService).modify(HOST_ID_VALID, MODIFY_HOST_REQUEST_INVALID);
+
+        // WHEN
+        RestContractExceptionResponse actualResponse =
+                fromJson(mockMvc
+                                .perform(patch(HOST_URL_VALID, HOST_ID_VALID)
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(toJson(MODIFY_HOST_REQUEST_INVALID))
+                                )
+                                .andExpect(status().isBadRequest())
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString(),
+                        RestContractExceptionResponse.class);
+        //AND THEN
+        assertThat(actualResponse.message()).isEqualTo(MODIFY_HOST_RESPONSE_BAD_REQUEST_MESSAGE);
+    }
+
     @SneakyThrows(JsonProcessingException.class)
     private String toJson(Object object) {
         return objectMapper.writeValueAsString(object);
