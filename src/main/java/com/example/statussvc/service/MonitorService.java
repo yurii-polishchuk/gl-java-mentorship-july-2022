@@ -5,6 +5,7 @@ import com.example.statussvc.domain.type.Status;
 import com.example.statussvc.repository.HostsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.eclipse.jetty.http.HttpStatus;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class MonitorService {
     @Scheduled(cron = "${application.scheduler.host.availability.cron}")
     public void checkHostsAvailability() {
         Iterable<Host> hosts = hostsRepository.findAll();
+
 
         hosts.forEach((host) -> {
             try {

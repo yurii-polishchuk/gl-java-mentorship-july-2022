@@ -1,11 +1,12 @@
 package com.example.statussvc.controller;
 
-import com.example.statussvc.domain.type.Status;
 import com.example.statussvc.wire.request.CreateHostRequest;
+import com.example.statussvc.wire.request.ReplaceHostRequest;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
 import com.example.statussvc.wire.type.StatusRest;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -24,6 +25,16 @@ public class HostControllerFixture {
             .description("Google Description")
             .url("https://google.com/")
             .build();
+
+    static final ReplaceHostRequest REPLACE_HOST_REQUEST = ReplaceHostRequest.builder()
+            .title("Google")
+            .description("Google Description")
+            .url("https://google.com/")
+            .build();
+
+    static final ReplaceHostRequest REPLACE_HOST_REQUEST_INVALID = ReplaceHostRequest.builder()
+            .build();
+
     static final RetrieveAllHostsResponse FIRST_RETRIEVE_HOST_RESPONSE = RetrieveAllHostsResponse.builder()
             .title("Google")
             .description("Google Description")
@@ -52,7 +63,6 @@ public class HostControllerFixture {
             .lastCheck(LAST_CHECK_DATE_TIME)
             .build();
 
-
     static final List<RetrieveAllHostsResponse> RETRIEVE_ALL_HOSTS_RESPONSE = List.of(FIRST_RETRIEVE_HOST_RESPONSE, SECOND_RETRIEVE_HOST_RESPONSE);
     static final PageResponse<RetrieveAllHostsResponse> GET_ALL_HOSTS_RESPONSE_PAGEABLE = new PageResponse<>(
             RETRIEVE_ALL_HOSTS_RESPONSE,
@@ -62,6 +72,7 @@ public class HostControllerFixture {
 
     static final String CREATE_HOST_REQUEST_INVALID = "{\"test\":\"test\"}";
     static final String CREATE_HOST_RESPONSE_BAD_REQUEST_MESSAGE = "description: must not be blank, title: must not be blank, url: must not be blank";
+    static final String REPLACE_HOST_RESPONSE_BAD_REQUEST_MESSAGE = "description: must not be blank, title: must not be blank, url: must not be blank";
     private static final String API_V1 = "/api/v1";
     static final String HOSTS_URL_VALID = API_V1 + "/hosts";
     static final String HOST_URL_VALID = HOSTS_URL_VALID + "/{id}";

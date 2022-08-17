@@ -37,5 +37,4 @@ public class MonitorServiceTest {
                 .atMost(Duration.ofMinutes(100L))
                 .untilAsserted(() -> verify(monitorService, atLeast(20)).checkHostsAvailability());
     }
-
 }

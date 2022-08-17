@@ -3,6 +3,7 @@ package com.example.statussvc.service;
 import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.request.CreateHostRequest;
+import com.example.statussvc.wire.request.ReplaceHostRequest;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,17 @@ public class HostsService {
         return hostsRepository.save(hostMapper.toHost(createHostRequest)).getId();
     }
 
-    public Object replace() {
-        return null;
+    /**
+     * Replaces e.g. Updates Host entry.
+     *
+     * @param id                 -                {@link Long} unique id of the Host in storage
+     * @param replaceHostRequest - {@link ReplaceHostRequest} replace request object
+     */
+    public void replace(Long id, ReplaceHostRequest replaceHostRequest) {
+        if (!hostsRepository.existsById(id)) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        }
+        hostsRepository.save(hostMapper.toHost(id, replaceHostRequest));
     }
 
     public Object modify() {
