@@ -22,11 +22,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class TestContainerTest {
 
-    @Autowired
-    private HostsRepository hostsRepository;
-
     @ClassRule
     public static SingletonTestContainer container = SingletonTestContainer.getInstance();
+    @Autowired
+    private HostsRepository hostsRepository;
 
     @BeforeEach
     void setup() {

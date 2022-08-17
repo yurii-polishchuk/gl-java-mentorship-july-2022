@@ -33,10 +33,9 @@ import static com.example.statussvc.Constants.URL_SEPARATOR;
 @RequestMapping(API_V1)
 public class HostsController {
 
+    public static final int DEFAULT_PAGE_SIZE = 3;
     private static final String HOSTS_ENDPOINT = "/hosts";
     private static final String HOST_ENDPOINT = HOSTS_ENDPOINT + "/{id}";
-    public static final int DEFAULT_PAGE_SIZE = 3;
-
     private final Tracer tracer;
     private final HostsService hostsService;
 
@@ -105,29 +104,27 @@ public class HostsController {
     }
 
     /**
-     * DELETE to delete One Host entry.
+     * DELETE to remove One Host entry.
      *
      * @param id {@link Long} unique identifier
      * @return {@link ResponseEntity} without body
      */
     @DeleteMapping(path = HOST_ENDPOINT)
-    public ResponseEntity delete(@PathVariable @Positive Long id) {
+    public ResponseEntity<Void> remove(@PathVariable @Positive Long id) {
         hostsService.remove(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
 
-    }
-
-    public Object removeAll() {
-        return null;
     }
 
     /**
-     * Returns the hex representation of the span's trace ID.
+     * DELETE to remove All Host entries.
      *
-     * @return trace ID in {@link String} representation
+     * @return {@link ResponseEntity} without body
      */
-    private String getTraceId() {
-        return tracer.currentSpan().context().traceIdString();
+    @DeleteMapping(path = HOSTS_ENDPOINT)
+    public Object removeAll() {
+        hostsService.removeAll();
+        return ResponseEntity.noContent().build();
     }
 
 }

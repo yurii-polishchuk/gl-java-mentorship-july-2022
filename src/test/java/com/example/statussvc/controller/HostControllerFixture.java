@@ -16,6 +16,7 @@ public class HostControllerFixture {
 
     static final Long HOST_ID_VALID = 1024L;
     static final Long HOST_ID_INVALID = 42L;
+    static final String HOST_ID_MALFORMED = "MALFORMED_ID";
     static final String STORAGE_EXCEPTION_MESSAGE = "Connection Error";
     static final String NOT_FOUND_EXCEPTION_MESSAGE = "NOT_FOUND";
     static final LocalDateTime LAST_CHECK_DATE_TIME = LocalDateTime.parse("2022-08-02T10:15:30");
@@ -44,6 +45,7 @@ public class HostControllerFixture {
             .connectionTime(Duration.ZERO)
             .lastCheck(LAST_CHECK_DATE_TIME)
             .build();
+
     static final RetrieveAllHostsResponse SECOND_RETRIEVE_HOST_RESPONSE = RetrieveAllHostsResponse.builder()
             .title("Bing")
             .description("Bing Description")
@@ -53,6 +55,7 @@ public class HostControllerFixture {
             .connectionTime(Duration.ZERO)
             .lastCheck(LocalDateTime.now())
             .build();
+
     static final RetrieveHostResponse RETRIEVE_HOST_RESPONSE_VALID = RetrieveHostResponse.builder()
             .title("Apple")
             .description("Apple Inc.")
@@ -64,15 +67,18 @@ public class HostControllerFixture {
             .build();
 
     static final List<RetrieveAllHostsResponse> RETRIEVE_ALL_HOSTS_RESPONSE = List.of(FIRST_RETRIEVE_HOST_RESPONSE, SECOND_RETRIEVE_HOST_RESPONSE);
+    
     static final PageResponse<RetrieveAllHostsResponse> GET_ALL_HOSTS_RESPONSE_PAGEABLE = new PageResponse<>(
             RETRIEVE_ALL_HOSTS_RESPONSE,
             PAGE_REQUEST
     );
+
     static final PageResponse<RetrieveAllHostsResponse> GET_ALL_HOSTS_EMPTY_RESPONSE_PAGEABLE = new PageResponse<>(List.of(), PAGE_REQUEST);
 
     static final String CREATE_HOST_REQUEST_INVALID = "{\"test\":\"test\"}";
     static final String CREATE_HOST_RESPONSE_BAD_REQUEST_MESSAGE = "description: must not be blank, title: must not be blank, url: must not be blank";
     static final String REPLACE_HOST_RESPONSE_BAD_REQUEST_MESSAGE = "description: must not be blank, title: must not be blank, url: must not be blank";
+    static final String DELETE_HOST_RESPONSE_BAD_REQUEST_MESSAGE = "id: provided wrong type, expected type is Long";
     private static final String API_V1 = "/api/v1";
     static final String HOSTS_URL_VALID = API_V1 + "/hosts";
     static final String HOST_URL_VALID = HOSTS_URL_VALID + "/{id}";

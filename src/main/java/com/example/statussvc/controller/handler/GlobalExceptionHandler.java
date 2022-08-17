@@ -6,6 +6,7 @@ import com.example.statussvc.wire.response.RestContractExceptionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -76,6 +78,44 @@ public class GlobalExceptionHandler {
                 exception
         );
     }
+
+    /**
+     * Exception handler for empty results in storage.
+     *
+     * @param exception {@link EmptyResultDataAccessException} to catch and extract error messages from fields
+     * @return {@link ResponseEntity} with status {@link HttpStatus#NOT_FOUND},
+     */
+    @ExceptionHandler
+    @SuppressWarnings("unused")
+    public ResponseEntity<RestContractExceptionResponse> handleBindException(EmptyResultDataAccessException exception) {
+        return map(
+                HttpStatus.NOT_FOUND,
+                HttpStatus.NOT_FOUND.name(),
+                exception
+        );
+    }
+
+    /**
+     * Method argument mismatch exception handler.
+     *
+     * @param exception {@link MethodArgumentTypeMismatchException} to catch and extract meaningful response
+     * @return {@link ResponseEntity} with status {@link HttpStatus#BAD_REQUEST}
+     */
+    @ExceptionHandler
+    @SuppressWarnings("unused")
+    public ResponseEntity<RestContractExceptionResponse> handleBindException(MethodArgumentTypeMismatchException exception) {
+        return map(
+                HttpStatus.BAD_REQUEST,
+                Stream.concat(
+                        Stream.of(exception.getName() + REASON_DELIMITER + "provided wrong type"),
+                        Stream.ofNullable(exception.getRequiredType())
+                                .map(Class::getSimpleName)
+                                .map("expected type is "::concat)
+                ),
+                exception
+        );
+    }
+
 
     /**
      * Not readable request data exception handler.

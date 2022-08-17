@@ -38,7 +38,7 @@ public class HostsService {
     /**
      * Replaces e.g. Updates Host entry.
      *
-     * @param id                 -                {@link Long} unique id of the Host in storage
+     * @param id                 - {@link Long} unique id of the Host in storage
      * @param replaceHostRequest - {@link ReplaceHostRequest} replace request object
      */
     public void replace(Long id, ReplaceHostRequest replaceHostRequest) {
@@ -80,15 +80,14 @@ public class HostsService {
      * @param id - {@link Long} unique entry identifier
      */
     public void remove(Long id) {
-        try {
-            hostsRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
-        }
+        hostsRepository.deleteById(id);
     }
 
-    public Object removeAll() {
-        return null;
+    /**
+     * Remove all Hosts
+     */
+    public void removeAll() {
+        hostsRepository.deleteAll();
     }
 
 }

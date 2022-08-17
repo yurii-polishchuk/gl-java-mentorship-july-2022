@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -320,7 +321,7 @@ class HostControllerTest {
     @DisplayName("""
             GIVEN invalid host id and valid host object
             WHEN performing PUT request
-            THEN return response with code 404  and no host entry
+            THEN return response with code 404 and no host entry
             """)
     void replaceHostByInvalidId() throws Exception {
         // GIVEN
@@ -376,10 +377,12 @@ class HostControllerTest {
     @DisplayName("""
             GIVEN valid host id
             WHEN performing DELETE request
-            THEN return response with code 200
+            THEN return response with code 204 and remove entry
             """)
-    void deleteHostByValidId() throws Exception {
+    void removeHostByValidId() throws Exception {
         // GIVEN
+        doNothing().when(hostsService).remove(HOST_ID_VALID);
+
         // WHEN
         MockHttpServletResponse actualResponse = mockMvc
                 .perform(delete(HOST_URL_VALID, HOST_ID_VALID)
@@ -387,11 +390,121 @@ class HostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 // THEN
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andReturn()
                 .getResponse();
+
         // AND THEN
         assertThat(actualResponse.getContentAsString()).isBlank();
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN malformed host id
+            WHEN performing DELETE request
+            THEN return response with code 400 and remove entry
+            """)
+    void removeHostByMalformedId() throws Exception {
+        // GIVEN
+
+        // WHEN
+        RestContractExceptionResponse actualResponse = fromJson(mockMvc
+                        .perform(delete(HOST_URL_VALID, HOST_ID_MALFORMED)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                        )
+                        // THEN
+                        .andExpect(status().isBadRequest())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                RestContractExceptionResponse.class);
+
+        // AND THEN
+        assertThat(actualResponse.message()).isEqualTo(DELETE_HOST_RESPONSE_BAD_REQUEST_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN valid host id
+            WHEN performing DELETE request
+            THEN return response with code 204 and remove entry
+            """)
+    void removeHostByInvalidId() throws Exception {
+        // GIVEN
+        doThrow(new EmptyResultDataAccessException(0))
+                .when(hostsService).remove(HOST_ID_INVALID);
+
+        // WHEN
+        RestContractExceptionResponse actualResponse = fromJson(mockMvc
+                        .perform(delete(HOST_URL_VALID, HOST_ID_INVALID)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(REPLACE_HOST_REQUEST))
+                        )
+                        // THEN
+                        .andExpect(status().isNotFound())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                RestContractExceptionResponse.class);
+
+        // AND THEN
+        assertThat(actualResponse.message()).isEqualTo(NOT_FOUND_EXCEPTION_MESSAGE);
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN valid removal all request
+            WHEN performing DELETE all request
+            THEN return response with code 204 and remove all entries
+            """)
+    void removeAllHostsValid() throws Exception {
+        // GIVEN
+        doNothing().when(hostsService).remove(HOST_ID_VALID);
+
+        // WHEN
+        MockHttpServletResponse actualResponse = mockMvc
+                .perform(delete(HOST_URL_VALID, HOST_ID_VALID)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                // THEN
+                .andExpect(status().isNoContent())
+                .andReturn()
+                .getResponse();
+
+        // AND THEN
+        assertThat(actualResponse.getContentAsString()).isBlank();
+    }
+
+    @Test
+    @DisplayName("""
+            GIVEN valid removal all request
+            WHEN performing DELETE all request
+            THEN return response with code 404 and remove all entry if not found
+            """)
+    void removeAllHostsException() throws Exception {
+        // GIVEN
+        doThrow(new EmptyResultDataAccessException(0))
+                .when(hostsService).removeAll();
+
+        // WHEN
+        RestContractExceptionResponse actualResponse = fromJson(mockMvc
+                        .perform(delete(HOSTS_URL_VALID)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(REPLACE_HOST_REQUEST))
+                        )
+                        // THEN
+                        .andExpect(status().isNotFound())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                RestContractExceptionResponse.class);
+
+        // AND THEN
+        assertThat(actualResponse.message()).isEqualTo(NOT_FOUND_EXCEPTION_MESSAGE);
     }
 
     @SneakyThrows(JsonProcessingException.class)
