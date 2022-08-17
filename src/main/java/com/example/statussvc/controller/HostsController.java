@@ -5,7 +5,6 @@ import com.example.statussvc.service.HostsService;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.request.ReplaceHostRequest;
 import com.example.statussvc.wire.response.ReplaceHostResponse;
-import com.example.statussvc.wire.response.RestContractExceptionResponse;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
