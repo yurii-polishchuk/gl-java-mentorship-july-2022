@@ -4,6 +4,8 @@ import com.example.statussvc.mapper.HostMapper;
 import com.example.statussvc.repository.HostsRepository;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.request.ReplaceHostRequest;
+import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
+import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -34,21 +36,16 @@ public class HostsService {
     }
 
     /**
-     * Updates or creates new Host.
+     * Replaces e.g. Updates Host entry.
      *
-     * @param id  -                {@link Long} unique id of the Host in storage
+     * @param id                 -                {@link Long} unique id of the Host in storage
      * @param replaceHostRequest - {@link ReplaceHostRequest} replace request object
-     * @return {@link ReplaceHostResponse} replace response object
      */
-    public ReplaceHostResponse replace(Long id, ReplaceHostRequest replaceHostRequest) {
-        return hostsRepository.findById(id)
-                .map((updatedHost) -> {
-                    updatedHost.setTitle(replaceHostRequest.title());
-                    updatedHost.setDescription(replaceHostRequest.description());
-                    updatedHost.setUrl(replaceHostRequest.url());
-                    return hostMapper.toReplaceHostResponse(hostsRepository.save(updatedHost));
-                })
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+    public void replace(Long id, ReplaceHostRequest replaceHostRequest) {
+        if (!hostsRepository.existsById(id)) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        }
+        hostsRepository.save(hostMapper.toHost(id, replaceHostRequest));
     }
 
     public Object modify() {

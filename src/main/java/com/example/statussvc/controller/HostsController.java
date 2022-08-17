@@ -4,7 +4,6 @@ import brave.Tracer;
 import com.example.statussvc.service.HostsService;
 import com.example.statussvc.wire.request.CreateHostRequest;
 import com.example.statussvc.wire.request.ReplaceHostRequest;
-import com.example.statussvc.wire.response.ReplaceHostResponse;
 import com.example.statussvc.wire.response.RetrieveAllHostsResponse;
 import com.example.statussvc.wire.response.RetrieveHostResponse;
 import lombok.RequiredArgsConstructor;
@@ -58,13 +57,20 @@ public class HostsController {
         ).build();
     }
 
+    /**
+     * PUT to replace One Host entry.
+     *
+     * @param id                 {@link Long} unique identifier
+     * @param replaceHostRequest {@link ReplaceHostRequest} with body
+     * @return {@link ResponseEntity} of {@link Void}
+     */
     @PutMapping(path = HOST_ENDPOINT)
-    public ResponseEntity<ReplaceHostResponse> replace(
+    public ResponseEntity<Void> replace(
             @PathVariable Long id,
             @Valid @RequestBody ReplaceHostRequest replaceHostRequest
     ) {
-        return ResponseEntity.ok(
-                hostsService.replace(id, replaceHostRequest));
+        hostsService.replace(id, replaceHostRequest);
+        return ResponseEntity.noContent().build();
     }
 
     public Object modify() {

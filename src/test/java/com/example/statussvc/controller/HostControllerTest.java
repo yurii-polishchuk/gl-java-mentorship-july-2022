@@ -36,7 +36,7 @@ import java.util.Objects;
 import static com.example.statussvc.controller.HostControllerFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -296,9 +296,9 @@ class HostControllerTest {
             WHEN performing PUT request
             THEN return response with code 200 and no host entry
             """)
-    void putHostByValidId() throws Exception {
+    void replaceHostByValidId() throws Exception {
         // GIVEN
-        given(hostsService.replace(HOST_ID_VALID, REPLACE_HOST_REQUEST)).willReturn(REPLACE_HOST_RESPONSE_VALID);
+        doNothing().when(hostsService).replace(HOST_ID_VALID, REPLACE_HOST_REQUEST);
 
         // WHEN
         MockHttpServletResponse actualResponse = mockMvc
@@ -308,62 +308,68 @@ class HostControllerTest {
                         .content(toJson(REPLACE_HOST_REQUEST))
                 )
                 // THEN
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andReturn()
                 .getResponse();
 
         // AND THEN
-        assertThat(actualResponse.getContentAsString()).isEqualTo(toJson(REPLACE_HOST_RESPONSE_VALID));
+        assertThat(actualResponse.getContentAsString()).isEmpty();
     }
 
     @Test
     @DisplayName("""
             GIVEN invalid host id and valid host object
             WHEN performing PUT request
-            THEN return response with code 404
+            THEN return response with code 404  and no host entry
             """)
-    void putHostByInvalidId() throws Exception {
+    void replaceHostByInvalidId() throws Exception {
         // GIVEN
-        given(hostsService.replace(HOST_ID_INVALID, REPLACE_HOST_REQUEST))
-                .willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        doThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND))
+                .when(hostsService).replace(HOST_ID_INVALID, REPLACE_HOST_REQUEST);
 
         // WHEN
-        mockMvc
-                .perform(put(HOST_URL_VALID, HOST_ID_INVALID)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(REPLACE_HOST_REQUEST))
-                )
-                // THEN
-                .andExpect(status().isNotFound());
+        RestContractExceptionResponse actualResponse = fromJson(mockMvc
+                        .perform(put(HOST_URL_VALID, HOST_ID_INVALID)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(toJson(REPLACE_HOST_REQUEST))
+                        )
+                        // THEN
+                        .andExpect(status().isNotFound())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                RestContractExceptionResponse.class);
+
+        // AND THEN
+        assertThat(actualResponse.message()).isEqualTo(NOT_FOUND_EXCEPTION_MESSAGE);
     }
 
     @Test
     @DisplayName("""
             GIVEN valid host id and invalid host object
             WHEN performing PUT request
-            THEN return response with code 400
+            THEN return response with code 400 and message "Bad Request"
             """)
-    void putHostByValidIdAndInvalidReplaceHostRequest() throws Exception {
+    void replaceHostByValidIdAndInvalidReplaceHostRequest() throws Exception {
         // GIVEN
-        given(hostsService.replace(HOST_ID_VALID, REPLACE_HOST_REQUEST_INVALID))
-                .willReturn(REPLACE_HOST_RESPONSE_VALID);
+        doNothing().when(hostsService).replace(HOST_ID_VALID, REPLACE_HOST_REQUEST_INVALID);
 
         // WHEN
         RestContractExceptionResponse actualResponse =
                 fromJson(mockMvc
-                        .perform(put(HOST_URL_VALID, HOST_ID_VALID)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(toJson(REPLACE_HOST_REQUEST_INVALID))
-                        )
-                        .andExpect(status().isBadRequest())
+                                .perform(put(HOST_URL_VALID, HOST_ID_VALID)
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(toJson(REPLACE_HOST_REQUEST_INVALID))
+                                )
+                                .andExpect(status().isBadRequest())
                                 .andReturn()
                                 .getResponse()
-                        .getContentAsString(),
-                RestContractExceptionResponse.class);
+                                .getContentAsString(),
+                        RestContractExceptionResponse.class);
         //AND THEN
-        assertThat(actualResponse.message()).isEqualTo(BLANK_DESCRIPTION_MESSAGE);
+        assertThat(actualResponse.message()).isEqualTo(REPLACE_HOST_RESPONSE_BAD_REQUEST_MESSAGE);
     }
 
     @Test

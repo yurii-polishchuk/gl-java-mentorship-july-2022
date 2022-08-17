@@ -17,8 +17,6 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
-
 /**
  * Generic Monitor Service
  */
@@ -29,19 +27,15 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 public class MonitorService {
 
     private final HostsRepository hostsRepository;
+    private final HttpClient httpClient;
 
     /**
-     * Add docs
+     * Checking host availability
      */
     @Scheduled(cron = "${application.scheduler.host.availability.cron}")
     public void checkHostsAvailability() {
-        log.info("checking...");
         Iterable<Host> hosts = hostsRepository.findAll();
-        HttpClient httpClient = HttpClient
-                .newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .connectTimeout(Duration.of(30L, SECONDS))
-                .build();
+
 
         hosts.forEach((host) -> {
             try {
@@ -52,20 +46,15 @@ public class MonitorService {
                         .build();
 
                 LocalDateTime start = LocalDateTime.now();
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                httpClient.send(request, HttpResponse.BodyHandlers.ofString());
                 LocalDateTime finish = LocalDateTime.now();
-                if (response.statusCode() == HttpStatus.OK_200) {
-                    host.setStatus(Status.ACTIVE);
-                    host.setConnectionTime(Duration.between(start, finish));
-                } else {
-                    host.setStatus(Status.INACTIVE);
-                }
-                host.setLastCheck(LocalDateTime.now());
-                log.info("host: " + host);
-                hostsRepository.save(host);
+                host.setStatus(Status.ACTIVE);
+                host.setConnectionTime(Duration.between(start, finish));
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                host.setStatus(Status.INACTIVE);
             }
+            host.setLastCheck(LocalDateTime.now());
+            hostsRepository.save(host);
         });
     }
 
