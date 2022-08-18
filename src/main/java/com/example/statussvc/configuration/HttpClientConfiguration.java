@@ -8,16 +8,25 @@ import java.time.Duration;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
+/**
+ * Different Http Clients configuration.
+ */
 @Configuration
-public class ApplicationConfiguration {
+public class HttpClientConfiguration {
 
+    /**
+     * Custom bean configuration for a HTTP Client.
+     *
+     * @return pre-built instance of {@link HttpClient}
+     */
     @Bean
     public HttpClient httpClient() {
         return HttpClient
                 .newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .connectTimeout(Duration.of(30L, SECONDS))
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.of(10L, SECONDS))
                 .build();
     }
+
 }
 

@@ -19,4 +19,5 @@ public record RetrieveHostResponse(
         StatusRest status,
         LocalDateTime lastCheck
 ) implements Response {
+
 }

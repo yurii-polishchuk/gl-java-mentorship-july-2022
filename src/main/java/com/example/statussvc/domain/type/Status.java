@@ -22,7 +22,6 @@ public enum Status {
      */
     UNKNOWN;
 
-
     private final String value = super.toString().toLowerCase();
 
     @JsonValue

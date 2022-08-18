@@ -15,4 +15,5 @@ public record CreateHostRequest(
         @NotBlank @Size(min = 1, max = 1024) String description,
         @NotBlank @Size(min = 1, max = 1024) @URL String url
 ) implements Request {
+
 }
