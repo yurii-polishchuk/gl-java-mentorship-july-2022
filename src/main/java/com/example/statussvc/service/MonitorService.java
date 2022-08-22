@@ -15,6 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.stream.IntStream;
 
 /**
@@ -84,13 +85,15 @@ public class MonitorService {
 
         host.setConnectionTime(Duration.ofMillis(System.currentTimeMillis() - startTimeMillis));
         host.setStatus(status);
+        host.setLastCheck(LocalDateTime.now());
 
         log.info(
-                "STORING HOST: {}, URL: {}, STATUS: {}, TIME: {} ms",
+                "STORING HOST: {}, URL: {}, STATUS: {}, TIME: {} ms, LAST CHECK: {}",
                 host.getTitle(),
                 host.getUrl(),
                 host.getStatus(),
-                host.getConnectionTime().toMillis()
+                host.getConnectionTime().toMillis(),
+                host.getLastCheck()
         );
 
         return host;
